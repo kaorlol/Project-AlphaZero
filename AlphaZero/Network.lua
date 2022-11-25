@@ -3,12 +3,15 @@ local Network = {}; do
         local Args = {...}
 
         local Success, Error = pcall(function()
-            Remote:InvokeServer(unpack(Args))
+            Remote:FireServer(unpack(Args))
         end)
 
         if not Success then
             Remote:FireServer()
         end
+    end
+    function Network:Receive(Remote, Callback)
+        Remote.OnClientEvent:Connect(Callback)
     end
     function Network:Notify(UILib, Title, Content, Duration)
         UILib:Notify({
