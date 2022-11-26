@@ -28,7 +28,7 @@ function LoadScript()
             warn(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
         end
     else
-        Network:NotifyPrompt("Unsupported Game", string.format('"%s" is not supported by AlphaZero, would you like to execute our Universal Script?', MSName), 5, function(Value)
+        Network:NotifyPrompt("Unsupported Game", string.format('"%s" is not supported by AlphaZero, would you like to execute our Universal Script?', MSName), 30, function(Value)
             if Value then
                 loadstring(game:HttpGet(string.format("%s%s", Client.Github, "Universal.lua")))()
             elseif not Value then
