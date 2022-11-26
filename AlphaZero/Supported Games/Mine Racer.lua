@@ -55,21 +55,6 @@ function GetEgg(Egg)
     end
 end
 
-function CompleteObby()
-    for _, Obby in next, workspace:GetChildren() do
-        local OldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-        if Obby:FindFirstChild("ProximityPrompt") then
-            if Obby.Name ~= "RewardsChest" then
-                Network:TeleportTo(Obby.CFrame)
-                task.wait(0.25)
-                fireproximityprompt(Obby.ProximityPrompt)
-                task.wait(0.25)
-            end
-        end
-        Network:TeleportTo(OldPos)
-    end
-end
-
 local MarketplaceService = game:GetService("MarketplaceService")
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
@@ -78,6 +63,11 @@ local Window = Rayfield:CreateWindow({
     Name = GameName,
     LoadingTitle = GameName,
     LoadingSubtitle = "By: Kaoru~#6438",
+    Discord = {
+        Enabled = true,
+        Invite = "JdzPVMNFwY",
+        RememberJoins = true,
+     },
 })
 
 local Main = Window:CreateTab('Main')
@@ -179,7 +169,18 @@ Obby:CreateSection('Complete Obby')
 Obby:CreateButton({
     Name = 'Complete Obby',
     Callback = function()
-        CompleteObby()
+        for _, Obby in next, workspace:GetChildren() do
+            local OldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+            if Obby:FindFirstChild("ProximityPrompt") then
+                if Obby.Name ~= "RewardsChest" then
+                    Network:TeleportTo(Obby.CFrame)
+                    task.wait(0.25)
+                    fireproximityprompt(Obby.ProximityPrompt)
+                    task.wait(0.25)
+                end
+            end
+            Network:TeleportTo(OldPos)
+        end
     end
 })
 
