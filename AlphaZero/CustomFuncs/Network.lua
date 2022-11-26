@@ -1,3 +1,4 @@
+local NotificationLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Sw1ndlerScripts/RobloxScripts/main/Notification%20Library/main.lua"))()
 local Network = {}; do
     function Network:Send(Remote, ...)
         local Args = {...}
@@ -24,13 +25,24 @@ local Network = {}; do
     function Network:Receive(Remote, Callback)
         Remote.OnClientEvent:Connect(Callback)
     end
-    function Network:Notify(UILib, Title, Content, Duration)
-        UILib:Notify({
+    function Network:Notify(Title, Content, Duration)
+        NotificationLib:CreateDefaultNotif({
+            TweenSpeed = 1,
             Title = Title,
-            Content = Content,
+            Text = Content,
+            Duration = Duration
+        })
+    end
+    function Network:NotifyPrompt(Title, Content, Duration, Callback)
+        NotificationLib:CreatePromptNotif({
+            TweenSpeed = 1,
+            Title = Title,
+            Text = Content,
             Duration = Duration,
-            Image = 4483362458,
-         })
+            Callback = Callback,
+            TrueText = "Yes",
+            FalseText = "No"
+        })
     end
 end
 return Network
