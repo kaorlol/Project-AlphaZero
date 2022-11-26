@@ -5,14 +5,15 @@ local Client = {
     },
 }
 
-function LoadScript()
-    local function GetGame()
-        for PlaceId, GameName in next, Client.Games do
-            if tostring(game.PlaceId) == PlaceId then
-                return GameName
-            end
+function GetGame()
+    for PlaceId, GameName in next, Client.Games do
+        if tostring(game.PlaceId) == PlaceId then
+            return GameName
         end
     end
+end
+
+function LoadScript()
     local GameName = GetGame()
     if GameName then
         local Success, Error = pcall(function()
@@ -22,7 +23,8 @@ function LoadScript()
             warn(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
         end
     else
-        warn("AlphaZero does not support this game.")
+        warn("AlphaZero does not support this game, loading universal script...")
+        loadstring(game:HttpGet(string.format("%s%s", Client.Github, "Universal.lua")))()
     end
 end
 
