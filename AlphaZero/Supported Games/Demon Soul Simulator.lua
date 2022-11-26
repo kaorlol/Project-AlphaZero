@@ -1,3 +1,4 @@
+local Network = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Network.lua"))()
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -17,49 +18,42 @@ local Client = {
     },
 }
 
-table.insert(Client.Connections.CharacterAdded, LocalPlayer.CharacterAdded:Connect(function(Char)
-    Character = Char
-    Humanoid = Char:WaitForChild("Humanoid")
-    HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
-end))
+-- table.insert(Client.Connections.CharacterAdded, LocalPlayer.CharacterAdded:Connect(function(Char)
+--     Character = Char
+--     Humanoid = Char:WaitForChild("Humanoid")
+--     HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
+-- end))
 
-local Network = {}; do
-    function Network:Send(Remote, ...)
-        local Args = {...}
+-- local Network = {}; do
+--     function Network:Send(Remote, ...)
+--         local Args = {...}
 
-        local Success, Error = pcall(function()
-            Remote:FireServer(unpack(Args))
-        end)
+--         local Success, Error = pcall(function()
+--             Remote:FireServer(unpack(Args))
+--         end)
 
-        if not Success then
-            Remote:FireServer()
-        end
-    end
-    function Network:Notify(Title, Content, Duration)
-        Rayfield:Notify({
-            Title = Title,
-            Content = Content,
-            Duration = Duration,
-            Image = 4483362458,
-         })
-    end
-    function Network:GetLowerNumberFromString(String)
-        local LowerNumber = math.huge
-        for Number in string.gmatch(String, '%d+') do
-            if tonumber(Number) < LowerNumber then
-                LowerNumber = tonumber(Number)
-            end
-        end
-        return LowerNumber
-    end
-end
-
-local Chars = {}
-for _, Char in next, workspace.TrainGhosts.Uvxtq:GetChildren() do
-    if Char:IsA("Model") then
-        table.insert(Chars, Char)
-    end
-end
+--         if not Success then
+--             Remote:FireServer()
+--         end
+--     end
+--     function Network:Notify(Title, Content, Duration)
+--         Rayfield:Notify({
+--             Title = Title,
+--             Content = Content,
+--             Duration = Duration,
+--             Image = 4483362458,
+--          })
+--     end
+--     function Network:GetLowerNumberFromString(String)
+--         local LowerNumber = math.huge
+--         for Number in string.gmatch(String, '%d+') do
+--             if tonumber(Number) < LowerNumber then
+--                 LowerNumber = tonumber(Number)
+--             end
+--         end
+--         return LowerNumber
+--     end
+-- end
 
 local AttackFuncs = {}; do
     function AttackFuncs:GetEnemies()
