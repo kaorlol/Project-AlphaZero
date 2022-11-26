@@ -13,10 +13,14 @@ local Client = {
         PickaxeEvent = ReplicatedStorage.Remotes.pickaxeEvent,
     },
     PlayerData = {
-        PickaxeData = LocalPlayer.Data.Pickaxes
+        PickaxeData = LocalPlayer.Data.Pickaxes,
+        CoinsData = LocalPlayer.Data.Coins,
+        WinsData = LocalPlayer.Data.Wins,
     },
     Frames = {
-        LeaveFrame = PlayerGui.UIs.UIs.readyFrame.Leave
+        LeaveFrame = PlayerGui.UIs.UIs.readyFrame.Leave,
+        MineFrame = PlayerGui.UIs.UIs.upgradeFrame.mineFrame,
+        PickaxeFrame = PlayerGui.UIs.UIs.upgradeFrame.pickaxeFrame,
     },
     Upgrades = {
         "Cooldown";
@@ -47,6 +51,21 @@ function GetEgg(Egg)
         if Eggs[i] == Egg then
             return tostring(i - 1)
         end
+    end
+end
+
+function completeObby()
+    for i,v in pairs(workspace:GetChildren()) do
+        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        if v:FindFirstChild("ProximityPrompt") then
+            if v.Name ~= "RewardsChest" then
+                teleportTo(v)
+                task.wait(0.25)
+                fireproximityprompt(v.ProximityPrompt)
+                task.wait(0.25)
+            end
+        end
+        teleportTo(oldPos)
     end
 end
 
@@ -89,10 +108,34 @@ Main:CreateToggle({
         shared.AutoUpgrade = AutoUpgrade
         if AutoUpgrade then
             task.spawn(function()
-                while shared.AutoUpgrade do task.wait(1)
+                while shared.AutoUpgrade do task.wait(0.5)
                     for _, Upgrade in next, Client.Upgrades do
                         Network:Send(Client.Remotes.UpgradeEvent, Upgrade)
                     end
+                end
+            end)
+        end
+    end
+})
+
+Main:CreateSection('Auto Equip')
+
+Main:CreateToggle({
+    Name = 'Auto Equip Pickaxe',
+    Callback = function(AutoEquip)
+        shared.AutoEquip = AutoEquip
+        if AutoEquip then
+            task.spawn(function()
+                while shared.AutoEquip do task.wait(0.5)
+                    local Best = 0
+                    for _, Pickaxe in next, Client.PlayerData.PickaxeData:GetChildren() do
+                        local PickaxeNum = tonumber(Pickaxe.Name)
+                        if PickaxeNum > Best then
+                            Best = PickaxeNum
+                        end
+                    end
+                    Pickaxe = Client.PlayerData.PickaxeData[tostring(Best)]
+                    Network:Send(Client.Remotes.PickaxeEvent, "EQUIP", Pickaxe)
                 end
             end)
         end
@@ -118,9 +161,9 @@ Egg:CreateToggle({
         shared.Egg = shared.Egg or Eggs[1]
         if AutoBuyEgg then
             task.spawn(function()
-                while shared.AutoBuyEgg do task.wait(1)
+                while shared.AutoBuyEgg do task.wait(0.5)
                     local Egg = GetEgg(shared.Egg)
-                    Network:Send(Client.Remotes.RequestEgg, "Open", workspace.Eggs[Egg])
+                    Network:Send(Client.Remotes.RequestEgg, workspace.Eggs[Egg])
                 end
             end)
         end
