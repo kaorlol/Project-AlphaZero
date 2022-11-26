@@ -28,8 +28,8 @@ function LoadScript()
             warn(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
         end
     else
-        Network:Notify("Unsupported Game", MSName .. " is not Supported", 3)
-        task.wait(1)
+        Network:Notify("Unsupported Game", string.format("%s is not Supported", MSName), 5)
+        task.wait(1.5)
         Network:NotifyPrompt("Universal", "Would you like to load the universal script?", 30, function(Value)
             if Value then
                 loadstring(game:HttpGet(string.format("%s%s", Client.Github, "Universal.lua")))()
