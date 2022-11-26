@@ -8,6 +8,7 @@ local Client = {
     Remotes = {
         MineEvent = ReplicatedStorage.Remotes.mineEvent,
         JoinEvent = ReplicatedStorage.Remotes.joinEvent,
+        RequestLeave = ReplicatedStorage.Remotes.requestLeave,
         UpgradeEvent = ReplicatedStorage.Remotes.upgradeEvent,
         RequestEgg = ReplicatedStorage.Remotes.requestEgg,
         PickaxeEvent = ReplicatedStorage.Remotes.pickaxeEvent,
@@ -96,6 +97,8 @@ Main:CreateToggle({
                     end
                 end
             end)
+        else
+            Network:Send(Client.Remotes.RequestLeave, "LEAVE")
         end
     end
 })
@@ -121,7 +124,7 @@ Main:CreateToggle({
 Main:CreateSection('Auto Equip')
 
 Main:CreateToggle({
-    Name = 'Auto Equip Pickaxe',
+    Name = 'Auto Equip Best Pickaxe',
     Callback = function(AutoEquip)
         shared.AutoEquip = AutoEquip
         if AutoEquip then
