@@ -43,11 +43,11 @@ local SuffixLib = {}; do
         local Suffix = string.match(String, "%a+")
         local Number = string.gsub(String, "%a+", "")
         if not Suffix then
-            return Number
+            return tonumber(Number)
         end
         for i = 1, #Suffixes do
             if Suffixes[i] == Suffix then
-                return Number * 1000 ^ i
+                return tonumber(Number) * 1000 ^ i
             end
         end
     end
