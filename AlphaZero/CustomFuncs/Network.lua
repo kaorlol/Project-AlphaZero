@@ -1,4 +1,4 @@
-local NotificationLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Sw1ndlerScripts/RobloxScripts/main/Notification%20Library/main.lua"))()
+local NotificationLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/NotificationLib.lua"))()
 local Network = {}; do
     function Network:Send(Remote, ...)
         local Args = {...}
