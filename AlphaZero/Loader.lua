@@ -2,6 +2,7 @@ local Client = {
     Github = "https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/",
     Games = {
         ["8069117419"] = "Demon%20Soul%20Simulator";
+        ["10898965735"] = "Mine%20Racer";
     },
 }
 
