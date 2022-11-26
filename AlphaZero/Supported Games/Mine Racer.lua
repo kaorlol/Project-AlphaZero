@@ -12,11 +12,13 @@ local Client = {
         UpgradeEvent = ReplicatedStorage.Remotes.upgradeEvent,
         RequestEgg = ReplicatedStorage.Remotes.requestEgg,
         PickaxeEvent = ReplicatedStorage.Remotes.pickaxeEvent,
+        CodesEvent = ReplicatedStorage.Remotes.codesEvent,
     },
     PlayerData = {
         PickaxeData = LocalPlayer.Data.Pickaxes,
         CoinsData = LocalPlayer.Data.Coins,
         WinsData = LocalPlayer.Data.Wins,
+        AutoClickData = LocalPlayer.Data.Settings.AutoClick,
     },
     Frames = {
         LeaveFrame = PlayerGui.UIs.UIs.readyFrame.Leave,
@@ -26,6 +28,18 @@ local Client = {
     Upgrades = {
         "Cooldown";
         "Dig";
+    },
+    Codes = {
+        "10KLIKES";
+        "THANKYOU!";
+        "100KMEMBERS!";
+        "YOURFAVOURITEYOUTUBER!";
+        "BLOXER1ONYOUTUBE!";
+        "LETSDOTHESHAKER!";
+        "LETSGOOOO!";
+        "4MILLIONVISITS!";
+        "WORLDCUP";
+        "UPDATE3";
     },
 }
 
@@ -62,7 +76,7 @@ local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shle
 local Window = Rayfield:CreateWindow({
     Name = GameName,
     LoadingTitle = GameName,
-    LoadingSubtitle = "By: Kaoru~#6438",
+    LoadingSubtitle = "By: Kaoru~#6438 and Sw1ndler#7733",
     Discord = {
         Enabled = true,
         Invite = "JdzPVMNFwY",
@@ -73,7 +87,7 @@ local Window = Rayfield:CreateWindow({
 local Main = Window:CreateTab('Main')
 Main:CreateSection('Auto Mine')
 
-Main:CreateToggle({
+local AutoMineToggle = Main:CreateToggle({
     Name = 'Auto Mine',
     Callback = function(AutoMine)
         shared.AutoMine = AutoMine
@@ -163,10 +177,49 @@ Egg:CreateToggle({
     end
 })
 
-local Obby = Window:CreateTab('Obby')
-Obby:CreateSection('Complete Obby')
+local Misc = Window:CreateTab('Misc')
+Misc:CreateSection('Obby')
 
-Obby:CreateButton({
+Misc:CreateToggle({
+    Name = "Auto Complete Obby",
+    CurrentValue = false,
+    Callback = function(AutoCompleteObby)
+        shared.AutoCompleteObby = AutoCompleteObby
+        if AutoCompleteObby then
+            task.spawn(function()
+                while shared.AutoCompleteObby do task.wait(0.05)
+                    local inGame = LocalPlayer.isGame
+                    if PlayerGui.UIs.UIs.ObbyLabel.Visible == false then
+                        if inGame then
+                            shared.AutoMine = false
+                            AutoMineToggle:Set(false)
+                        end
+                    
+                        for _, Obby in next, workspace:GetChildren() do
+                            local OldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+                            if Obby:FindFirstChild("ProximityPrompt") then
+                                if Obby.Name ~= "RewardsChest" then
+                                    Network:TeleportTo(Obby.CFrame)
+                                    task.wait(0.25)
+                                    fireproximityprompt(Obby.ProximityPrompt)
+                                    task.wait(0.25)
+                                end
+                            end
+                            Network:TeleportTo(OldPos)
+                        end
+                
+                        if inGame then
+                            shared.AutoMine = true
+                            AutoMineToggle:Set(true)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+Misc:CreateButton({
     Name = 'Complete Obby',
     Callback = function()
         for _, Obby in next, workspace:GetChildren() do
@@ -181,6 +234,54 @@ Obby:CreateButton({
             end
             Network:TeleportTo(OldPos)
         end
+    end
+})
+
+Misc:CreateSection('Unlock Auto Mine Gamepass')
+
+Misc:CreateButton({
+    Name = 'Unlock Auto Mine Gamepass',
+    Callback = function()
+        ToggleButton = PlayerGui.UIs.UIs.settingsFrame.Frame.AutoClick.Frame.confirmButton.TextButton
+
+        for _, Connection in next, getconnections(ToggleButton.MouseButton1Down) do
+            Connection:Disable()
+        end
+
+        ToggleButton.MouseButton1Down:Connect(function()
+            if ToggleButton.Parent.TextLabel.Text == "OFF" then
+                Client.PlayerData.AutoClickData.Value = true
+            else
+                Client.PlayerData.AutoClickData.Value = false
+            end
+        end)
+    end
+})
+
+Misc:CreateSection('Redeem Codes')
+
+Misc:CreateButton({
+    Name = 'Redeem All Codes',
+    Callback = function()
+        for _, Code in next, Client.Codes do
+            Network:Send(Client.Remotes.CodesEvent, Code)
+        end
+    end
+})
+
+local Credits = Window:CreateTab('Credits')
+Credits:CreateSection('Credits')
+
+Credits:CreateParagraph({
+    Title = "Say thanks to the devs!",
+    Content = "Main Dev: Kaoru#6438; Main Dev: Sw1ndler#7733; UI Dev: shlex#9425",
+})
+
+Credits:CreateSection('Discord')
+Credits:CreateButton({
+    Name = 'Join Discord',
+    Callback = function()
+        Network:SendInvite("JdzPVMNFwY")
     end
 })
 
