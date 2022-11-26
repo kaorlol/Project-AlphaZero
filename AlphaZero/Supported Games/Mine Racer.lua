@@ -62,8 +62,6 @@ Main:CreateToggle({
                     end
                 end
             end)
-        else
-            firesignal(Client.Frames.LeaveFrame.MouseButton1Click)
         end
     end
 })
@@ -133,4 +131,9 @@ Egg:CreateToggle({
     end
 })
 
-Network:Notify(Rayfield, "Loaded", string.format("Successfully Loaded AlphaZero for %s!", GameName))
+Rayfield:Notify({
+    Title = "Loaded",
+    Content = string.format("Successfully Loaded AlphaZero for %s!", GameName),
+    Duration = 5,
+    Image = 4483362458,
+})
