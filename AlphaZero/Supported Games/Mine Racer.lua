@@ -54,18 +54,18 @@ function GetEgg(Egg)
     end
 end
 
-function completeObby()
-    for i,v in pairs(workspace:GetChildren()) do
-        local oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
-        if v:FindFirstChild("ProximityPrompt") then
-            if v.Name ~= "RewardsChest" then
-                teleportTo(v)
+function CompleteObby()
+    for _, Obby in next, workspace:GetChildren() do
+        local OldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        if Obby:FindFirstChild("ProximityPrompt") then
+            if Obby.Name ~= "RewardsChest" then
+                Network:TeleportTo(Obby.CFrame)
                 task.wait(0.25)
-                fireproximityprompt(v.ProximityPrompt)
+                fireproximityprompt(Obby.ProximityPrompt)
                 task.wait(0.25)
             end
         end
-        teleportTo(oldPos)
+        Network:TeleportTo(OldPos)
     end
 end
 
@@ -163,10 +163,20 @@ Egg:CreateToggle({
             task.spawn(function()
                 while shared.AutoBuyEgg do task.wait(0.5)
                     local Egg = GetEgg(shared.Egg)
-                    Network:Send(Client.Remotes.RequestEgg, workspace.Eggs[Egg])
+                    Network:Send(Client.Remotes.RequestEgg, "Open", workspace.Eggs[tostring(Egg)])
                 end
             end)
         end
+    end
+})
+
+local Obby = Window:CreateTab('Obby')
+Obby:CreateSection('Complete Obby')
+
+Obby:CreateButton({
+    Name = 'Complete Obby',
+    Callback = function()
+        CompleteObby()
     end
 })
 
