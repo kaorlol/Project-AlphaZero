@@ -94,7 +94,7 @@ local Network = {}; do
 		
 		for i = 6453, 6464 do
 			local DiscordInviteRequest = function()
-				local DiscordRequest = RequestFunction({
+				local Request = RequestFunction({
 					Url = string.format(DiscordApiUrl, tostring(i)),
 					Method = "POST",
 					Body = HttpService:JSONEncode({
