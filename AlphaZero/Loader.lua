@@ -1,3 +1,4 @@
+local Network = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua"))()
 local Client = {
     Github = "https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/",
     Games = {
@@ -5,6 +6,9 @@ local Client = {
         ["10898965735"] = "Mine%20Racer";
     },
 }
+
+local MarketplaceService = game:GetService("MarketplaceService")
+local MSName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 function GetGame()
     for PlaceId, GameName in next, Client.Games do
@@ -24,8 +28,9 @@ function LoadScript()
             warn(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
         end
     else
-        warn("AlphaZero does not support this game, loading universal script...")
-        loadstring(game:HttpGet(string.format("%s%s", Client.Github, "Universal.lua")))()
+        Network:NotifyPrompt("Unsupported Game", string.format('"%s" is not supported by AlphaZero, would you like to request support?', MSName), 5, function()
+            loadstring(game:HttpGet(string.format("%s%s", Client.Github, "Universal.lua")))()
+        end)
     end
 end
 
