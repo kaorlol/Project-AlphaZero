@@ -66,7 +66,7 @@ local Network = {}; do
         end
     end
     function Network:TeleportTo(CFrame)
-        Character:PivotTo(CFrame)
+        HumanoidRootPart.CFrame = CFrame
     end
     function Network:SendInvite(DiscordID)
         local Settings = {
