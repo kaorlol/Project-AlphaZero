@@ -4,6 +4,7 @@ local Client = {
     Games = {
         ["8069117419"] = "Demon%20Soul%20Simulator";
         ["10898965735"] = "Mine%20Racer";
+        ["7525610732"] = "Kaizen"
     },
 }
 
