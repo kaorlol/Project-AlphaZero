@@ -84,7 +84,6 @@ function autoPlay()
                                             
                                             if note:FindFirstChild("Hold") then
                                                 task.wait(note.Hold.Time.Value - smallRandom(0, settings.autoPlay.holdNoteVariation))
-                                                print(note.Hold.Time.Value - smallRandom(0, settings.autoPlay.holdNoteVariation))
                                             else
                                                 repeat task.wait() until note.Parent ~= v
                                             end
