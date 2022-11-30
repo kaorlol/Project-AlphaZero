@@ -57,6 +57,7 @@ local Network = {}; do
         })
     end
     function Network:TweenTo(CFrame, Time)
+        local TweenService = game:GetService("TweenService")
         local TweenInfo = TweenInfo.new(Time, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
         local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame})
         Tween:Play()
