@@ -46,7 +46,7 @@ local SuffixLib = {}; do
             return tonumber(Number)
         end
         for i = 1, #Suffixes do
-            if Suffixes[i] == Suffix then
+            if Suffixes[i]:lower() == Suffix then
                 return tonumber(Number) * 1000 ^ i
             end
         end
