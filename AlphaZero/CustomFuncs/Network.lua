@@ -20,7 +20,7 @@ local Network = {}; do
         end)
 
         if not Success then
-            Remote:FireServer()
+            error(Error)
         end
     end
     function Network:Invoke(Remote, ...)
@@ -63,10 +63,10 @@ local Network = {}; do
         Tween:Play()
         Tween.Completed:Wait()
     end
-    function Network:MoveTo(CFrame)
+    function Network:MoveTo(Position)
         local PathfindingService = game:GetService("PathfindingService")
         local Path = PathfindingService:CreatePath()
-        Path:ComputeAsync(HumanoidRootPart.Position, CFrame.Position)
+        Path:ComputeAsync(HumanoidRootPart.Position, Position)
         local Waypoints = Path:GetWaypoints()
 
         for _, Waypoint in next, Waypoints do
