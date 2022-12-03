@@ -51,5 +51,15 @@ local SuffixLib = {}; do
             end
         end
     end
+
+    function SuffixLib:ConvertSN(String)
+        local String = tostring(String)
+        local Number = string.match(String, "%d+")
+        local Exponent = string.match(String, "%d+e%+?(%d+)")
+        if not Exponent then
+            return tonumber(Number)
+        end
+        return tonumber(Number) * 10 ^ tonumber(Exponent)
+    end
 end
 return SuffixLib
