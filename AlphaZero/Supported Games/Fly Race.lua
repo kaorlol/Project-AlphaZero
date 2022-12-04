@@ -1,5 +1,6 @@
 local Network = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua"))()
 local SuffixLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/SuffixLib.lua"))()
+local TableLib = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/TableLib.lua"))()
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -76,12 +77,12 @@ local SelectedWorldToggle = Main:CreateDropdown({
         local Worlds = ReplicatedStorage.Worlds:GetChildren()
         local Places = {}
 
-        for Int, World in Worlds do
+        for Int, World in next, Worlds do
             local Config = require(World.Config)
             Places[Int] = Config.Title
         end
 
-        for Int, Place in Places do
+        for Int, Place in next, Places do
             if Option == Place then
                 SelectedWorld = Int
                 SelectedLandSpot = workspace["LandSpots"..Int]
@@ -116,12 +117,12 @@ Main:CreateToggle({
                         local Worlds = ReplicatedStorage.Worlds:GetChildren()
                         local Places = {}
 
-                        for Int, World in Worlds do
+                        for Int, World in next, Worlds do
                             local Config = require(World.Config)
                             Places[Int] = Config.Title
                         end
 
-                        for Int, Place in Places do
+                        for Int, Place in next, Places do
                             if ClosestWorld.Name == tostring(Int) then
                                 SelectedWorldToggle:Set(Place)
                             end
