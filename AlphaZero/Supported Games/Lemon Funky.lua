@@ -23,7 +23,6 @@ function getCombo()
         player = "P1"
     end
     stats = plr.PlayerGui.GameGui.Stats.Health[player .. "Stats"].Text
-    printTable(string.split(stats, "|"))
 end
 
 function getStats(side)
