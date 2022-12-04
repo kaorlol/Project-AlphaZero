@@ -6,7 +6,7 @@ local Client = {
         ["10898965735"] = "Mine%20Racer";
         ["7525610732"] = "Kaizen";
         ["6569830174"] = "Lemon%20Funky";
-        ["6679968919"] = "Fly Race";
+        ["6679968919"] = "Fly%20Race";
     },
 }
 
@@ -28,7 +28,7 @@ function LoadScript()
             loadstring(game:HttpGet(string.format("%s%s%s", Client.Github, GameName, ".lua")))()
         end)
         if not Success then
-            warn(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
+            error(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
         end
     else
         Network:Notify("Unsupported Game", string.format("%s is not Supported", MSName), 5)
