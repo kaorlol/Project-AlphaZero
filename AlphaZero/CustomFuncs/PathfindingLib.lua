@@ -59,7 +59,7 @@ local Pathfinding = {}; do
         end
 
         for Waypoint = 1, #Waypoints do
-            local TweenInfo = TweenInfo.new(0.0000001, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+            local TweenInfo = TweenInfo.new(0, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
             local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame.new(Waypoints[Waypoint].Position)})
             Tween:Play()
 
