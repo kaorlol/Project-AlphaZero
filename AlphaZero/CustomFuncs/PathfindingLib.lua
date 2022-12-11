@@ -1,3 +1,4 @@
+local Network = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua")))();
 local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
