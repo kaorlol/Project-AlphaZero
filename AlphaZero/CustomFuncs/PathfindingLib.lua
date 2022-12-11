@@ -42,7 +42,7 @@ local Pathfinding = {}; do
         end
     end;
 
-    function Pathfinding:TweenTo(Positions, Time, Wait)
+    function Pathfinding:TweenTo(Positions, Wait)
         local Start;
 
         if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
@@ -59,7 +59,7 @@ local Pathfinding = {}; do
         end
 
         for Waypoint = 1, #Waypoints do
-            local TweenInfo = TweenInfo.new(Time, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+            local TweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
             local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame.new(Waypoints[Waypoint].Position)})
             Tween:Play()
 
