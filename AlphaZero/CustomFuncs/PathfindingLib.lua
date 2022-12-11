@@ -5,6 +5,7 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
 local Humanoid = Character:WaitForChild("Humanoid");
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart");
 local PathfindingService = game:GetService("PathfindingService");
+local TweenService = game:GetService("TweenService");
 
 local Pathfinding = {}; do
     function Pathfinding:MoveTo(Positions, Wait)
