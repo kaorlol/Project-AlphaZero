@@ -8,7 +8,7 @@ local PathfindingService = game:GetService("PathfindingService");
 local TweenService = game:GetService("TweenService");
 
 local Pathfinding = {}; do
-    function Pathfinding:MoveTo(Positions, Wait)
+    function Pathfinding:MoveTo(Position, Wait)
         local Start;
 
         if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
@@ -17,7 +17,7 @@ local Pathfinding = {}; do
             Start = Character.Torso
         end
 
-        local Path = PathfindingService:FindPathAsync(Start.Position, Positions);
+        local Path = PathfindingService:FindPathAsync(Start.Position, Position);
         local Waypoints = Path:GetWaypoints();
 
         if #Waypoints == 0 then
@@ -69,7 +69,7 @@ local Pathfinding = {}; do
         end
     end;
 
-    function Pathfinding:DrawPath()
+    function Pathfinding:DrawPath(Positions)
         local Start;
 
         if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
