@@ -89,3 +89,4 @@ local Pathfinding = {}; do
         end
     end;
 end
+return Pathfinding
