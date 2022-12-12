@@ -83,11 +83,11 @@ function autoPlay()
                                             
                                             if note:FindFirstChild("Hold") then
                                                 task.wait(note.Hold.Time.Value - smallRandom(0, settings.autoPlay.holdNoteVariation))
-                                            elseif note:FindFirstChild("Time") then
-                                                task.wait(notes[i + 1].Time.Value - note.Time.Value - 0.5)
                                             else
-                                                task.wait(1)
+                                                local parent = note.Parent
+                                                repeat task.wait() until note.Parent ~= parent
                                             end
+                                            
                                             game.VirtualInputManager:SendKeyEvent(0, tostring(v), 0, game)
                                         end
                     
