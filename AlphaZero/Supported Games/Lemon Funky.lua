@@ -5,7 +5,6 @@ getgenv().settings = {
         holdNoteVariation = 0
     }
 }
-    
 
 plr = game:GetService("Players").LocalPlayer
 
@@ -23,6 +22,7 @@ function getCombo()
         player = "P1"
     end
     stats = plr.PlayerGui.GameGui.Stats.Health[player .. "Stats"].Text
+    printTable(string.split(stats, "|"))
 end
 
 function getStats(side)
@@ -68,8 +68,9 @@ function autoPlay()
                     if v:IsA("Frame") then
                         task.spawn(function()
                             repeat
-                                for _, note in pairs(v:GetChildren()) do
-                                    if note.AbsolutePosition.Y < 30 then
+                                notes = v:GetChildren()
+                                for i, note in pairs(notes) do
+                                    if note.AbsolutePosition.Y < 20 then
                         
                                         local playNote
                                         if settings.autoPlay.maxCombo ~= 0 and getStats(side).Combo >= settings.autoPlay.maxCombo then
@@ -77,18 +78,19 @@ function autoPlay()
                                         else
                                             playNote = true
                                         end
-                                        
                                         if playNote then
                                             game.VirtualInputManager:SendKeyEvent(1, tostring(v), 0, game)
                                             
                                             if note:FindFirstChild("Hold") then
                                                 task.wait(note.Hold.Time.Value - smallRandom(0, settings.autoPlay.holdNoteVariation))
+                                            elseif note:FindFirstChild("Time") then
+                                                task.wait(notes[i + 1].Time.Value - note.Time.Value - 0.5)
                                             else
-                                                repeat task.wait() until note.Parent ~= v
+                                                task.wait(1)
                                             end
                                             game.VirtualInputManager:SendKeyEvent(0, tostring(v), 0, game)
                                         end
-                        
+                    
                                     end
                                 end
                                 task.wait()
@@ -117,7 +119,7 @@ local Window = Rayfield:CreateWindow({
       Enabled = true,
       FolderName = "Alpha Zero", -- Create a custom folder for your hub/game
       FileName = "Lemon Funky"
-   },
+  },
 })
 
 Main = Window:CreateTab("Main")
