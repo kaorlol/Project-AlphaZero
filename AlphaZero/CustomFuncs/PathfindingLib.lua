@@ -133,11 +133,16 @@ local Pathfinding = {}; do
                 while LoopToggle do task.wait()
                     for _, Line in next, Lines do
                         local _, OnScreen = Camera:WorldToViewportPoint(Line.From)
+                        local Distance = (Line.From - Line.To).Magnitude
 
                         if OnScreen then
                             Line.Line.Visible = true
                         else
                             Line.Line.Visible = false
+                        end
+
+                        if Distance <= 3 then
+                            Line.Line:Remove()
                         end
 
                         Line.Line.From = WorldToPoint(Line.From)
