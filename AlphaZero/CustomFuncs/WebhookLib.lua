@@ -120,7 +120,7 @@ local Webhook = {}; do
         if not Success then
             error(Error)
         else
-            Network:Notify("Success", string.format("Changed webhook setting %s to %s", Setting, Value), 5)
+            Network:Notify("Success", string.format("Changed webhook setting %s to %s", Setting, tostring(Value)), 5)
         end
     end;
 end
