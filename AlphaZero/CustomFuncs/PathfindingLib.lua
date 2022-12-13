@@ -145,6 +145,7 @@ local Pathfinding = {}; do
                             for _, Line in next, Lines do
                                 Line.Line:Destroy()
                             end
+                            table.clear(Lines)
                         end
 
                         Line.Line.From = WorldToPoint(Line.From)
