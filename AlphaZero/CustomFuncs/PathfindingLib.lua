@@ -113,14 +113,11 @@ local Pathfinding = {}; do
             local Lines = {}
 
             for Waypoint = 1, #Waypoints do
-                local LineInner = Drawing.new("Line");
-                local LineOuter = Drawing.new("Line");
+                local Line = Drawing.new("Line");
 
-                LineInner.Visible = true;
-                LineOuter.Visible = true;
+                Line.Visible = true;
 
-                LineInner.From = WorldToPoint(Waypoints[Waypoint].Position);
-                LineOuter.From = WorldToPoint(Waypoints[Waypoint].Position);
+                Line.From = WorldToPoint(Waypoints[Waypoint].Position);
 
                 local LineTo;
                 if Waypoints[Waypoint + 1] then
@@ -130,17 +127,10 @@ local Pathfinding = {}; do
                 end
 
                 Line.To = WorldToPoint(LineTo);
-                LineOuter.To = WorldToPoint(LineTo);
 
-                LineInner.Color = Color3.fromRGB(255, 255, 255);
-                LineOuter.Color = Color3.fromRGB(0, 0, 0);
-
-                LineInner.Thickness = 1;
-                LineOuter.Thickness = 2;
-
-                LineInner.Transparency = 1;
-                LineOuter.Transparency = 1;
-
+                Line.Color = Color3.fromRGB(255, 255, 255);
+                Line.Thickness = 2;
+                Line.Transparency = 1;
 
                 table.insert(Lines, {
                     Line = Line,
