@@ -64,7 +64,7 @@ local Pathfinding = {}; do
             Start = HumanoidRootPart;
         end
 
-        local Path = PathfindingService:FindPathAsync(Start.Position, Position);
+        local Path = PathfindingService:FindPathAsync(Start.Position + Vector3.new(0, 3, 0), Position);
         local Waypoints = Path:GetWaypoints();
 
         if #Waypoints == 0 then
@@ -72,8 +72,17 @@ local Pathfinding = {}; do
         end
 
         for Waypoint = 1, #Waypoints do
-            local TweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out);
-            local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame.new(Waypoints[Waypoint + 2].Position)});
+            local LongWaypoint;
+            if Waypoints[Waypoint + 5] then
+                LongWaypoint = Waypoints[Waypoint + 5].Position;
+            else
+                LongWaypoint = Waypoints[Waypoint].Position;
+            end
+
+
+            local Distance = (LongWaypoint - Start.Position).Magnitude;
+            local TweenInfo = TweenInfo.new(Distance / Humanoid.WalkSpeed, Enum.EasingStyle.Linear);
+            local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame.new(LongWaypoint + Vector3.new(0, 3, 0))});
             Tween:Play();
 
             if Wait then
@@ -105,9 +114,13 @@ local Pathfinding = {}; do
 
             for Waypoint = 1, #Waypoints do
                 local Line = Drawing.new("Line");
+                local LineOuter = Drawing.new("Line");
 
                 Line.Visible = true;
+                LineOuter.Visible = true;
+
                 Line.From = WorldToPoint(Waypoints[Waypoint].Position);
+                LineOuter.From = WorldToPoint(Waypoints[Waypoint].Position);
 
                 local LineTo;
                 if Waypoints[Waypoint + 1] then
@@ -117,10 +130,15 @@ local Pathfinding = {}; do
                 end
 
                 Line.To = WorldToPoint(LineTo);
+                LineOuter.To = WorldToPoint(LineTo);
 
                 Line.Color = Color3.fromRGB(255, 255, 255);
                 Line.Thickness = 2;
                 Line.Transparency = 1;
+                LineOuter.Color = Color3.fromRGB(0, 0, 0);
+                LineOuter.Thickness = 1;
+                LineOuter.Transparency = 1;
+
 
                 table.insert(Lines, {
                     Line = Line,
