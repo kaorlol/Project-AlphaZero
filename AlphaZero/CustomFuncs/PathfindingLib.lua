@@ -143,7 +143,7 @@ local Pathfinding = {}; do
 
                         if Distance <= 5 then
                             for _, Line in next, Lines do
-                                Line.Line:Remove()
+                                Line.Line:Destroy()
                             end
                         end
 
