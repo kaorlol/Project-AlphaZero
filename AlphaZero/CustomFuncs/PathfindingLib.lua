@@ -15,9 +15,9 @@ LocalPlayer.CharacterAdded:Connect(function(Char)
 end)
 
 function WorldToPoint(Position)
-    local Vector,_ = Camera:WorldToViewportPoint(Position)
-    local NewVector = Vector2.new(Vector.X, Vector.Y)
-    return NewVector
+    local Vector,_ = Camera:WorldToViewportPoint(Position);
+    local NewVector = Vector2.new(Vector.X, Vector.Y);
+    return NewVector;
 end
 
 local Pathfinding = {}; do
@@ -25,31 +25,31 @@ local Pathfinding = {}; do
         local Start;
 
         if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-            Start = Character.UpperTorso or Character.Torso
+            Start = Character.UpperTorso or Character.Torso;
         elseif Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-            Start = HumanoidRootPart
+            Start = HumanoidRootPart;
         end
 
         local Path = PathfindingService:FindPathAsync(Start.Position, Position);
         local Waypoints = Path:GetWaypoints();
 
         if #Waypoints == 0 then
-            Network:TeleportTo(CFrame.new(Position))
+            Network:TeleportTo(CFrame.new(Position));
         end
 
         for Waypoint = 1, #Waypoints do
             if Waypoints[Waypoint].Action == Enum.PathWaypointAction.Jump then
-                Humanoid.Jump = true
+                Humanoid.Jump = true;
                 Humanoid:MoveTo(Waypoints[Waypoint + 1].Position)
 
                 if Wait then
-                    Humanoid.MoveToFinished:Wait()
+                    Humanoid.MoveToFinished:Wait();
                 end
             else
-                Humanoid:MoveTo(Waypoints[Waypoint].Position)
+                Humanoid:MoveTo(Waypoints[Waypoint].Position);
 
                 if Wait then
-                    Humanoid.MoveToFinished:Wait()
+                    Humanoid.MoveToFinished:Wait();
                 end
             end
         end
@@ -59,25 +59,25 @@ local Pathfinding = {}; do
         local Start;
 
         if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-            Start = Character.UpperTorso or Character.Torso
+            Start = Character.UpperTorso or Character.Torso;
         elseif Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-            Start = HumanoidRootPart
+            Start = HumanoidRootPart;
         end
 
         local Path = PathfindingService:FindPathAsync(Start.Position, Position);
         local Waypoints = Path:GetWaypoints();
 
         if #Waypoints == 0 then
-            Network:TeleportTo(CFrame.new(Position))
+            Network:TeleportTo(CFrame.new(Position));
         end
 
         for Waypoint = 1, #Waypoints do
-            local TweenInfo = TweenInfo.new(0, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-            local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame.new(Waypoints[Waypoint].Position)})
-            Tween:Play()
+            local TweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out);
+            local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame.new(Waypoints[Waypoint + 2].Position)});
+            Tween:Play();
 
             if Wait then
-                Tween.Completed:Wait()
+                Tween.Completed:Wait();
             end
         end
     end;
@@ -88,16 +88,16 @@ local Pathfinding = {}; do
             local Start;
 
             if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-                Start = Character.UpperTorso or Character.Torso
+                Start = Character.UpperTorso or Character.Torso;
             elseif Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-                Start = HumanoidRootPart
+                Start = HumanoidRootPart;
             end
 
             local Path = PathfindingService:FindPathAsync(Start.Position, Position);
             local Waypoints = Path:GetWaypoints();
 
             if #Waypoints == 0 then
-                print("No path found")
+                print("No path found");
                 return;
             end
 
@@ -132,24 +132,24 @@ local Pathfinding = {}; do
             task.spawn(function()
                 while LoopToggle do task.wait()
                     for _, Line in next, Lines do
-                        local _, OnScreen = Camera:WorldToViewportPoint(Line.From)
-                        local Distance = (HumanoidRootPart.Position - Position).Magnitude
+                        local _, OnScreen = Camera:WorldToViewportPoint(Line.From);
+                        local Distance = (HumanoidRootPart.Position - Position).Magnitude;
 
                         if OnScreen then
-                            Line.Line.Visible = true
+                            Line.Line.Visible = true;
                         else
-                            Line.Line.Visible = false
+                            Line.Line.Visible = false;
                         end
 
                         if Distance <= 5 then
                             for _, Line in next, Lines do
-                                Line.Line:Destroy()
+                                Line.Line:Destroy();
                             end
-                            table.clear(Lines)
+                            table.clear(Lines);
                         end
 
-                        Line.Line.From = WorldToPoint(Line.From)
-                        Line.Line.To = WorldToPoint(Line.To)
+                        Line.Line.From = WorldToPoint(Line.From);
+                        Line.Line.To = WorldToPoint(Line.To);
                     end
                 end
             end)
