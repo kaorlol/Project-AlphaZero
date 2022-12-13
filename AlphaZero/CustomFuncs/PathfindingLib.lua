@@ -6,6 +6,7 @@ local Humanoid = Character:WaitForChild("Humanoid");
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart");
 local PathfindingService = game:GetService("PathfindingService");
 local TweenService = game:GetService("TweenService");
+local Camera = workspace.CurrentCamera;
 
 LocalPlayer.CharacterAdded:Connect(function(Char)
 	Character = Char
