@@ -3,7 +3,7 @@ local HttpService = game:GetService("HttpService")
 local Network = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua")))();
 
 local WebhookSettings = {
-    ["everyone"] = false;
+    ["@everyone"] = false;
 }
 
 local Webhook = {}; do
@@ -166,6 +166,21 @@ local Webhook = {}; do
     function Webhook:SaveWebhook(Webhook)
         writefile("SavedWebhook.txt", Webhook)
         Network:Notify("Success", "Saved webhook", 5)
+    end;
+
+    function Webhook:LoadWebhook()
+        local Webhook, Exists = nil, false;
+
+        if isfile("SavedWebhook.txt") then
+            Webhook = readfile("SavedWebhook.txt")
+            Network:Notify("Success", "Loaded webhook", 5)
+            Exists = true;
+        else
+            Network:Notify("Error", "No saved webhook found", 5)
+            Exists = false;
+        end
+
+        return Webhook, Exists
     end;
 end
 return Webhook
