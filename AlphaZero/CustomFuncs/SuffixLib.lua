@@ -19,14 +19,8 @@ local Suffixes = {
     "St",
     "O",
     "N",
-    "v",
+    "V",
     "c",
-    "La",
-    "De",
-    "Me",
-    "Hi",
-    "DS",
-    "Ds",
 }
 local SuffixLib = {}; do
     function SuffixLib:ConvertToSuffix(Number)
@@ -52,7 +46,7 @@ local SuffixLib = {}; do
         end
     end
 
-    function SuffixLib:ConvertSN(String)
+    function SuffixLib:ConvertFromSN(String)
         local String = tostring(String)
         local Number = string.match(String, "%d+")
         local Exponent = string.match(String, "%d+e%+?(%d+)")
@@ -60,6 +54,15 @@ local SuffixLib = {}; do
             return tonumber(Number)
         end
         return tonumber(Number) * 10 ^ tonumber(Exponent)
+    end
+
+    function SuffixLib:ConvertToSN(Number)
+        local Number = tonumber(Number)
+        if Number < 1000 then
+            return Number
+        end
+        local Exponent = math.floor(math.log(Number) / math.log(10))
+        return string.format("%.2f", Number / 10 ^ Exponent) .. "e" .. Exponent
     end
 end
 return SuffixLib
