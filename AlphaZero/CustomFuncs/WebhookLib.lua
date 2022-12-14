@@ -123,5 +123,49 @@ local Webhook = {}; do
             Network:Notify("Success", string.format("Changed webhook setting %s to %s", Setting, tostring(Value)), 5)
         end
     end;
+
+    function Webhook:GetSettings()
+        return WebhookSettings
+    end;
+
+    function Webhook:ResetSettings()
+        local Success, Error = pcall(function()
+            WebhookSettings = {
+                ["everyone"] = false;
+            }
+        end)
+
+        if not Success then
+            error(Error)
+        else
+            Network:Notify("Success", "Reset webhook settings", 5)
+        end
+    end;
+
+    function Webhook:SendEmbed(Webhook, Embed)
+        local Success, Error = pcall(function()
+            Request({
+                Url = Webhook,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json"
+                },
+                Body = HttpService:JSONEncode({
+                    embeds = {Embed}
+                })
+            })
+        end)
+
+        if not Success then
+            error(Error)
+        else
+            Network:Notify("Success", "Sent embed", 5)
+        end
+    end;
+
+    function Webhook:SaveWebhook(Webhook)
+        writefile("SavedWebhook.txt", Webhook)
+        Network:Notify("Success", "Saved webhook", 5)
+    end;
 end
 return Webhook
