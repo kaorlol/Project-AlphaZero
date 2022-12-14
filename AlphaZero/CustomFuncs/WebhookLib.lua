@@ -124,45 +124,6 @@ local Webhook = {}; do
         end
     end;
 
-    function Webhook:GetSettings()
-        return WebhookSettings
-    end;
-
-    function Webhook:ResetSettings()
-        local Success, Error = pcall(function()
-            WebhookSettings = {
-                ["everyone"] = false;
-            }
-        end)
-
-        if not Success then
-            error(Error)
-        else
-            Network:Notify("Success", "Reset webhook settings", 5)
-        end
-    end;
-
-    function Webhook:SendEmbed(Webhook, Embed)
-        local Success, Error = pcall(function()
-            Request({
-                Url = Webhook,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json"
-                },
-                Body = HttpService:JSONEncode({
-                    embeds = {Embed}
-                })
-            })
-        end)
-
-        if not Success then
-            error(Error)
-        else
-            Network:Notify("Success", "Sent embed", 5)
-        end
-    end;
-
     function Webhook:SaveWebhook(Webhook)
         writefile("SavedWebhook.txt", Webhook)
         Network:Notify("Success", "Saved webhook", 5)
@@ -173,8 +134,22 @@ local Webhook = {}; do
 
         if isfile("SavedWebhook.txt") then
             Webhook = readfile("SavedWebhook.txt")
+
+            local Response, Error = Request({
+                Url = Webhook,
+                Method = "GET",
+                Headers = {
+                    ["Content-Type"] = "application/json"
+                }
+            })
+
+            if Response then
+                Exists = true;
+            else
+                Network:Notify("Error", "The saved webhook is invalid, please enter a new one and save it", 5)
+            end
+
             Network:Notify("Success", "Loaded webhook", 5)
-            Exists = true;
         else
             Network:Notify("Error", "No saved webhook found", 5)
             Exists = false;
