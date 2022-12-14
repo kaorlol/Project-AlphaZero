@@ -1,4 +1,4 @@
-local spy = {currentTableDepth = 0,maxTableDepth = 10}
+local spy = {currentTableDepth = 0, maxTableDepth = 10}
 
 function toUnicode(string)
     local codepoints = "utf8.char("
@@ -229,9 +229,14 @@ local TableUtil = {}; do
         end
     end
 
-    function TableUtil:TableToString(Table, DoThing)
+    function TableUtil:TableToString(...)
+        local Args = {...}
+        local DoThing = Args[#Args]
+        if typeof(DoThing) == 'boolean' then
+            Args[#Args] = nil
+        end
         local String = "{"
-        for Index, Value in next, Table do
+        for Index, Value in next, Args do
             if typeof(Index) == 'number' then
                 string.format(String, "%s[%s] = %s,", String, spy.get_real_value(Index, DoThing), spy.get_real_value(Value, DoThing))
             else
