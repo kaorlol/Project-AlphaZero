@@ -124,16 +124,16 @@ local Webhook = {}; do
         end
     end;
 
-    function Webhook:SaveWebhook(Webhook)
-        writefile("SavedWebhook.txt", Webhook)
+    function Webhook:SaveWebhook(Webhook, Path)
+        writefile(Path, Webhook)
         Network:Notify("Success", "Saved webhook", 5)
     end;
 
-    function Webhook:LoadWebhook()
+    function Webhook:LoadWebhook(Path)
         local Webhook, Exists = nil, false;
 
-        if isfile("SavedWebhook.txt") then
-            Webhook = readfile("SavedWebhook.txt")
+        if isfile(Path) then
+            Webhook = readfile(Path)
 
             local Response, Error = Request({
                 Url = Webhook,
@@ -143,9 +143,12 @@ local Webhook = {}; do
                 }
             })
 
-            if Response then
+            if not Error then
+                print(string.format("Response: %s : Error: %s", Response, Error))
                 Exists = true;
             else
+                print(string.format("Response: %s : Error: %s", Response, Error))
+                Exists = false;
                 Network:Notify("Error", "The saved webhook is invalid, please enter a new one and save it", 5)
             end
 
