@@ -671,7 +671,7 @@ Misc:CreateSection('Webhook')
 
 local WebhookStatus = Misc:CreateLabel("Webhook Status: Webhook Not Set!")
 
-local Webhook, Exists = Utils.Webhook:LoadWebhook()
+local Webhook, Exists = Utils.Webhook:LoadWebhook(FolderName)
 if Exists then
     WebhookURL = Webhook;
     WebhookStatus:Set("Webhook Status: Webhook Set!")
