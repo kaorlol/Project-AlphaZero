@@ -1,28 +1,29 @@
+if gethui then
+    syn.protect_gui = gethui
+end
+
 local Network = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua"))()
 local Client = {
     Github = "https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/",
-    Games = {
-        ["8069117419"] = "Demon%20Soul%20Simulator";
-        ["10898965735"] = "Mine%20Racer";
-        ["7525610732"] = "Kaizen";
-        ["6569830174"] = "Lemon%20Funky";
-        ["6679968919"] = "Fly%20Race";
-    },
+    Games = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/StoredGames.lua")))(),
+    SupportedExploits = {
+        "Synapse X";
+        "Script-Ware";
+        "Krnl";
+    }
 }
 
 local MarketplaceService = game:GetService("MarketplaceService")
-local MSName = MarketplaceService:GetProductInfo(game.PlaceId).Name
-
-function GetGame()
-    for PlaceId, GameName in next, Client.Games do
-        if tostring(game.PlaceId) == PlaceId then
-            return GameName
-        end
-    end
-end
+local ProductName = MarketplaceService:GetProductInfo(game.PlaceId).Name
 
 function LoadScript()
-    local GameName = GetGame()
+    local GameName = nil;
+    for PlaceId, GamesName in next, Client.Games do
+        if tostring(game.PlaceId) == PlaceId then
+            GameName = GamesName
+            break;
+        end
+    end
     if GameName then
         local Success, Error = pcall(function()
             loadstring(game:HttpGet(string.format("%s%s%s", Client.Github, GameName, ".lua")))()
@@ -31,16 +32,21 @@ function LoadScript()
             error(string.format('Failed to load script for game: "%s", Error: %s', string.gsub(GameName, "%%20", " "), Error))
         end
     else
-        Network:Notify("Unsupported Game", string.format("%s is not Supported", MSName), 5)
+        Network:Notify("Unsupported Game", string.format("%s is not Supported", ProductName), 5)
         task.wait(1.5)
         Network:NotifyPrompt("Universal", "Would you like to load the universal script?", 30, function(Value)
             if Value then
                 loadstring(game:HttpGet(string.format("%s%s", Client.Github, "Universal.lua")))()
-            elseif not Value then
-                return;
             end
         end)
     end
 end
 
-LoadScript()
+task.spawn(function()
+    for _, Exploit in next, Client.SupportedExploits do
+        if identifyexecutor() == Exploit then
+            LoadScript()
+            break;
+        end
+    end
+end)
