@@ -205,15 +205,22 @@ Character.ChildAdded:Connect(function(Child)
     end
 end)
 
-getgenv().Toggles, getgenv().LoadToggles = {
-    AutoFarmSave = nil;
-    GotoCollectableSave = nil;
-    AutoMakeHoneySave = nil;
-    AutoCollectPollenSave = nil;
-    AutoAttackInfoSave = nil;
-    AutoEveryoneSave = nil;
-    SendInfoSave = nil;
-}, false;
+getgenv().LoadToggles = false;
+local Saves = {
+    Toggles = {
+        AutoFarmSave = nil;
+        GotoCollectableSave = nil;
+        AutoMakeHoneySave = nil;
+        AutoCollectPollenSave = nil;
+        AutoAttackInfoSave = nil;
+        AutoEveryoneSave = nil;
+        SendInfoSave = nil;
+    };
+    Dropdowns = {
+        ZoneToFarmSave = nil;
+        GotoMethodSave = nil;
+    };
+};
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 local Window = Rayfield:CreateWindow({
@@ -296,7 +303,7 @@ end
 local SortedZones = SortFromClosestToFarthest(Zones, Client.Locals.PlayersHive);
 
 local FarmingTeleport = SortedZones[1];
-Main:CreateDropdown({
+ZoneToFarmSave = Main:CreateDropdown({
     Name = "Zone To Farm";
     Options = SortedZones;
     CurrentOption = SortedZones[1];
@@ -305,7 +312,7 @@ Main:CreateDropdown({
     end;
 })
 
-Main:CreateDropdown({
+GotoMethodSave = Main:CreateDropdown({
     Name = "Goto Method";
     Options = {"Pathfinding", "Teleport", "Tween"};
     CurrentOption = "Pathfinding";
@@ -315,7 +322,7 @@ Main:CreateDropdown({
 })
 
 local AutoFarmToggle, GoingToOld = false, false;
-Toggles.AutoFarmSave = Main:CreateToggle({
+Saves.Toggles.AutoFarmSave = Main:CreateToggle({
     Name = "Auto Farm";
     CurrentValue = false;
     Callback = function(AutoFarm)
@@ -351,7 +358,7 @@ Toggles.AutoFarmSave = Main:CreateToggle({
 })
 
 local GotoCollectable = false;
-Toggles.GotoCollectableSave = Main:CreateToggle({
+Saves.Toggles.GotoCollectableSave = Main:CreateToggle({
     Name = "Goto Collectable";
     CurrentValue = false;
     Callback = function(GotoCollectableToggle)
@@ -430,7 +437,7 @@ task.spawn(function()
 end)
 
 local AutoMakeHoney, HoneyOldPosition = false, nil;
-Toggles.AutoMakeHoneySave = Main:CreateToggle({
+Saves.Toggles.AutoMakeHoneySave = Main:CreateToggle({
     Name = "Auto Make Honey";
     CurrentValue = false;
     Callback = function(AutoMakeHoneyToggle)
@@ -505,7 +512,7 @@ Toggles.AutoMakeHoneySave = Main:CreateToggle({
 })
 
 local AutoCollectFlowers = false;
-Toggles.AutoCollectFlowersSave = Main:CreateToggle({
+Saves.Toggles.AutoCollectFlowersSave = Main:CreateToggle({
     Name = "Auto Collect Pollen";
     CurrentValue = false;
     Callback = function(AutoCollectFlowersToggle)
@@ -526,7 +533,7 @@ AttackTab:CreateSection('Attack Handling')
 local AttackInfo = AttackTab:CreateLabel("Current Monster(s) Attacking: Awaiting Toggle...")
 
 local GetAttackInfo = false;
-Toggles.AutoAttackInfoSave = AttackTab:CreateToggle({
+Saves.Toggles.AutoAttackInfoSave = AttackTab:CreateToggle({
     Name = "Attack Info";
     CurrentValue = false;
     Callback = function(AutoAttackToggle)
@@ -722,7 +729,7 @@ Misc:CreateButton({
     end;
 })
 
-Toggles.AutoEveryoneSave = Misc:CreateToggle({
+Saves.Toggles.AutoEveryoneSave = Misc:CreateToggle({
     Name = "Use @everyone";
     CurrentValue = false;
     Callback = function(WebhookEveryoneToggle)
@@ -738,7 +745,7 @@ function DashAdder(Number)
     return Dash
 end
 
-Toggles.SendInfoSave = Misc:CreateToggle({
+Saves.Toggles.SendInfoSave = Misc:CreateToggle({
     Name = "Send Info On Important Events";
     CurrentValue = false;
     Callback = function(WebhookSendInfoToggle)
@@ -810,12 +817,23 @@ task.spawn(function()
             writefile(string.format("%s/Honey.txt", FolderName), TableToString(Averages["Honey"]))
         end
 
-        local Indexes = {};
-        for Index, Table in next, Toggles do
-            Indexes[Index] = Table.CurrentValue
-        end
+        task.spawn(function()
+            local Indexes = {};
+            for Index, Table in next, Saves.Toggles do
+                Indexes[Index] = Table.CurrentValue
+            end
 
-        writefile(string.format("%s/Toggles.txt", FolderName), FileToString(Indexes))
+            writefile(string.format("%s/Toggles.txt", FolderName), FileToString(Indexes))
+        end)
+
+        task.spawn(function()
+            local Indexes = {};
+            for Index, Table in next, Saves.Dropdowns do
+                Indexes[Index] = Table.CurrentOption
+            end
+
+            writefile(string.format("%s/Dropdowns.txt", FolderName), FileToString(Indexes))
+        end)
     end
 end)
 
@@ -835,13 +853,27 @@ if LoadToggles then
             Table[NewIndex] = Value
         end
         return Table
-    end    
-
-    local FolderName = "AlphaZero/Bee Swarm Simulator";
-    if isfile(string.format("%s/Toggles.txt", FolderName)) then
-        local Contents = readfile(string.format("%s/Toggles.txt", FolderName))
-        for Index, Value in next, FileToTable(Contents) do
-            Toggles[Index]:Set(Value == "true" and true or false)
-        end
     end
+
+    task.spawn(function()
+        local FolderName = "AlphaZero/Bee Swarm Simulator";
+        if isfile(string.format("%s/Toggles.txt", FolderName)) then
+            local Contents = readfile(string.format("%s/Toggles.txt", FolderName))
+            for Index, Value in next, FileToTable(Contents) do
+                Toggles[Index]:Set(Value == "true" and true or false)
+            end
+        end
+    end)
+
+    task.spawn(function()
+        local FolderName = "AlphaZero/Bee Swarm Simulator";
+        if isfile(string.format("%s/Dropdowns.txt", FolderName)) then
+            local Contents = readfile(string.format("%s/Dropdowns.txt", FolderName))
+            for Index, Value in next, FileToTable(Contents) do
+                Dropdowns[Index]:Set(Value)
+            end
+        end
+    end)
+
+    LoadToggles = false;
 end
