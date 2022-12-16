@@ -24,7 +24,7 @@ local Pathfinding = {}; do
     function Pathfinding:MoveTo(Position, Wait)
         local Start;
 
-        if Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+        if Humanoid.RigType == Enum.HumanoidRigType.R15 then
             Start = Character.UpperTorso or Character.Torso;
         elseif Character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
             Start = HumanoidRootPart;
@@ -156,6 +156,16 @@ local Pathfinding = {}; do
                                 Line.Line:Destroy();
                             end
                             table.clear(Lines);
+                        end
+
+                        if #Lines > 0 then
+                            local LastUpdate = tick();
+                            if tick() - LastUpdate >= 60 then
+                                for _, Line in next, Lines do
+                                    Line.Line:Destroy();
+                                end
+                                table.clear(Lines);
+                            end
                         end
 
                         Line.Line.From = WorldToPoint(Line.From);
