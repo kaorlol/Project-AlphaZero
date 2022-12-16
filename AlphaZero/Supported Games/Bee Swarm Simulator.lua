@@ -671,7 +671,7 @@ Misc:CreateSection('Webhook')
 
 local WebhookStatus = Misc:CreateLabel("Webhook Status: Webhook Not Set!")
 
-local Webhook, Exists = Utils.Webhook:LoadWebhook(FolderName)
+local Webhook, Exists = Utils.Webhook:LoadWebhook(string.format("%s/SavedWebhook.txt", FolderName));
 if Exists then
     WebhookURL = Webhook;
     WebhookStatus:Set("Webhook Status: Webhook Set!")
@@ -731,7 +731,7 @@ Misc:CreateToggle({
         WebhookSendInfo = WebhookSendInfoToggle;
 
         if WebhookSendInfoToggle == true then
-            Utils.Webhook:Send(WebhookURL, string.format("%s\nConnected on *%s*, Webhook has been toggled on!", DashAdder(197),game.JobId))
+            Utils.Webhook:Send(WebhookURL, string.format("%s\nConnected on *%s*, Webhook has been toggled on!", DashAdder(197), game.JobId))
         else
             Utils.Webhook:Send(WebhookURL, "**Webhook has been toggled off!**")
         end;
@@ -740,16 +740,14 @@ Misc:CreateToggle({
 
 Misc:CreateInput({
     Name = "Change Webhook Name";
-    PlaceholderText = "Webhook Name Here: (Remeber To Press Enter!)";
+    PlaceholderText = "Remeber To Press Enter!";
     RemoveTextAfterFocusLost = false;
     Callback = function(WebhookNameInput)
-        Utils.Webhook:ChangeName(WebhookNameInput);
+        Utils.Webhook:ChangeName(WebhookURL, WebhookNameInput);
 
         if WebhookSendInfo then
             Utils.Webhook:Send(WebhookURL, string.format("Webhook name has been changed to %s!", WebhookNameInput));
         end
-
-        Utils.Network:Notify("Success", string.format("Webhook name has been changed to %s!", WebhookNameInput), 5)
     end;
 })
 
