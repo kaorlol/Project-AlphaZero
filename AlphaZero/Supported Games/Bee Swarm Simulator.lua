@@ -812,8 +812,7 @@ task.spawn(function()
 
         local Indexes = {};
         for Index, Table in next, Toggles do
-            Index = string.format("['%s']", Index)
-            
+            Indexes[Index] = Table.CurrentValue
         end
 
         writefile(string.format("%s/Toggles.txt", FolderName), FileToString(Indexes))
