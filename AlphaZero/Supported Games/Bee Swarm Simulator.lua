@@ -205,6 +205,16 @@ Character.ChildAdded:Connect(function(Child)
     end
 end)
 
+getgenv().Toggles, getgenv().LoadToggles = {
+    AutoFarmSave = nil;
+    GotoCollectableSave = nil;
+    AutoMakeHoneySave = nil;
+    AutoCollectPollenSave = nil;
+    AutoAttackInfoSave = nil;
+    AutoEveryoneSave = nil;
+    SendInfoSave = nil;
+}, false;
+
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 local Window = Rayfield:CreateWindow({
     Name = string.format("Project: AlphaZero | %s", GameName),
@@ -305,7 +315,7 @@ Main:CreateDropdown({
 })
 
 local AutoFarmToggle, GoingToOld = false, false;
-Main:CreateToggle({
+Toggles.AutoFarmSave = Main:CreateToggle({
     Name = "Auto Farm";
     CurrentValue = false;
     Callback = function(AutoFarm)
@@ -341,7 +351,7 @@ Main:CreateToggle({
 })
 
 local GotoCollectable = false;
-Main:CreateToggle({
+Toggles.GotoCollectableSave = Main:CreateToggle({
     Name = "Goto Collectable";
     CurrentValue = false;
     Callback = function(GotoCollectableToggle)
@@ -420,7 +430,7 @@ task.spawn(function()
 end)
 
 local AutoMakeHoney, HoneyOldPosition = false, nil;
-Main:CreateToggle({
+Toggles.AutoMakeHoneySave = Main:CreateToggle({
     Name = "Auto Make Honey";
     CurrentValue = false;
     Callback = function(AutoMakeHoneyToggle)
@@ -475,7 +485,7 @@ Main:CreateToggle({
                     GoingToOld = true;
 
                     if WebhookSendInfo then
-                        Utils.Webhook:Send(WebhookURL, string.format("Finished making honey! Average honey you are making: *%s*.\nGoing back to old position...",
+                        Utils.Webhook:Send(WebhookURL, string.format("Finished making honey! Average honey being mad on convert: *%s*.\nGoing back to old position...",
                             AverageHoney()
                         ));
                     end
@@ -495,7 +505,7 @@ Main:CreateToggle({
 })
 
 local AutoCollectFlowers = false;
-Main:CreateToggle({
+Toggles.AutoCollectFlowersSave = Main:CreateToggle({
     Name = "Auto Collect Pollen";
     CurrentValue = false;
     Callback = function(AutoCollectFlowersToggle)
@@ -516,7 +526,7 @@ AttackTab:CreateSection('Attack Handling')
 local AttackInfo = AttackTab:CreateLabel("Current Monster(s) Attacking: Awaiting Toggle...")
 
 local GetAttackInfo = false;
-AttackTab:CreateToggle({
+Toggles.AutoAttackInfoSave = AttackTab:CreateToggle({
     Name = "Attack Info";
     CurrentValue = false;
     Callback = function(AutoAttackToggle)
@@ -712,7 +722,7 @@ Misc:CreateButton({
     end;
 })
 
-Misc:CreateToggle({
+Toggles.AutoEveryoneSave = Misc:CreateToggle({
     Name = "Use @everyone";
     CurrentValue = false;
     Callback = function(WebhookEveryoneToggle)
@@ -728,7 +738,7 @@ function DashAdder(Number)
     return Dash
 end
 
-Misc:CreateToggle({
+Toggles.SendInfoSave = Misc:CreateToggle({
     Name = "Send Info On Important Events";
     CurrentValue = false;
     Callback = function(WebhookSendInfoToggle)
@@ -781,6 +791,15 @@ Credits:CreateButton({
 
 Utils.Network:Notify("Loaded", string.format("Successfully Loaded AlphaZero for %s!", GameName), 5)
 
+
+function FileToString(Table)
+    local String = "";
+    for Index, Value in next, Table do
+        String ..= string.format('["%s"] = %s, ', Index, tostring(Value))
+    end
+    return String
+end
+
 task.spawn(function()
     local StoredNumberHoney = 0;
 
@@ -790,5 +809,40 @@ task.spawn(function()
 
             writefile(string.format("%s/Honey.txt", FolderName), TableToString(Averages["Honey"]))
         end
+
+        local Indexes = {};
+        for Index, Table in next, Toggles do
+            Index = string.format("['%s']", Index)
+            
+        end
+
+        writefile(string.format("%s/Toggles.txt", FolderName), FileToString(Indexes))
     end
 end)
+
+Utils.Network:QueueOnTeleport([[
+    repeat task.wait() until game:IsLoaded()
+
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Loader.lua")))();
+
+    LoadToggles = true;
+]])
+
+if LoadToggles then
+    function FileToTable(String)
+        local Table = {};
+        for Index, Value in string.gmatch(String, "%[(.-)%] = (.-),") do
+            local NewIndex = Index:gsub('"', "")
+            Table[NewIndex] = Value
+        end
+        return Table
+    end    
+
+    local FolderName = "AlphaZero/Bee Swarm Simulator";
+    if isfile(string.format("%s/Toggles.txt", FolderName)) then
+        local Contents = readfile(string.format("%s/Toggles.txt", FolderName))
+        for Index, Value in next, FileToTable(Contents) do
+            Toggles[Index]:Set(Value == "true" and true or false)
+        end
+    end
+end
