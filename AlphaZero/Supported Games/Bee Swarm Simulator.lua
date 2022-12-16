@@ -23,8 +23,6 @@ local GotoMethod = "Pathfinding";
 local Halt, BeingAttacked = false, false;
 local Dead, DeadOldPosition = false, nil;
 
-local GoingBackToPos = false;
-
 local MarketplaceService = game:GetService("MarketplaceService");
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name;
 
@@ -229,6 +227,8 @@ task.spawn(function()
             Dead = false;
 
             if DeadOldPosition ~= nil then
+                Halt = true;
+
                 task.wait(6);
 
                 Client = {
@@ -253,6 +253,8 @@ task.spawn(function()
                 end
 
                 Goto(DeadOldPosition, true)
+
+                Halt = false;
 
                 Utils.Network:Notify("Yay!", "You're back at your old position!", 5);
 
@@ -315,7 +317,7 @@ Main:CreateToggle({
                     local Zone = workspace.FlowerZones[FarmingTeleport];
                     local DistanceFrom = (HumanoidRootPart.Position - Zone.Position).Magnitude;
 
-                    if DistanceFrom > 150 and (Halt == false and GoingToOld == false and GoingBackToPos == false) then
+                    if DistanceFrom > 150 and (Halt == false and GoingToOld == false) then
                         Halt = true;
 
                         if WebhookSendInfo then
@@ -356,7 +358,7 @@ Main:CreateToggle({
                 if Collectable then
                     local Distance = (HumanoidRootPart.Position - Collectable.Position).Magnitude;
 
-                    if Distance <= 25 and (Halt == false and GoingBackToPos == false) then
+                    if Distance <= 25 and Halt == false then
                         Goto(Collectable.Position, false);
                     end
                 end
