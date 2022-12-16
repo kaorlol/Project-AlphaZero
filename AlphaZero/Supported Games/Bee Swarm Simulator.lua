@@ -860,7 +860,7 @@ if LoadToggles then
         if isfile(string.format("%s/Toggles.txt", FolderName)) then
             local Contents = readfile(string.format("%s/Toggles.txt", FolderName))
             for Index, Value in next, FileToTable(Contents) do
-                Toggles[Index]:Set(Value == "true" and true or false)
+                Saves.Toggles[Index]:Set(Value == "true" and true or false)
             end
         end
     end)
@@ -870,7 +870,7 @@ if LoadToggles then
         if isfile(string.format("%s/Dropdowns.txt", FolderName)) then
             local Contents = readfile(string.format("%s/Dropdowns.txt", FolderName))
             for Index, Value in next, FileToTable(Contents) do
-                Dropdowns[Index]:Set(Value)
+                Saves.Dropdowns[Index]:Set(Value)
             end
         end
     end)
