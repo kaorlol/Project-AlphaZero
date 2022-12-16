@@ -826,14 +826,14 @@ task.spawn(function()
             writefile(string.format("%s/Toggles.txt", FolderName), FileToString(Indexes))
         end)
 
-        task.spawn(function()
-            local Indexes = {};
-            for Index, Table in next, Saves.Dropdowns do
-                Indexes[Index] = Table.CurrentOption
-            end
+        -- task.spawn(function()
+        --     local Indexes = {};
+        --     for Index, Table in next, Saves.Dropdowns do
+        --         Indexes[Index] = Table.CurrentOption
+        --     end
 
-            writefile(string.format("%s/Dropdowns.txt", FolderName), FileToString(Indexes))
-        end)
+        --     writefile(string.format("%s/Dropdowns.txt", FolderName), FileToString(Indexes))
+        -- end)
     end
 end)
 
@@ -865,15 +865,15 @@ if LoadToggles then
         end
     end)
 
-    task.spawn(function()
-        local FolderName = "AlphaZero/Bee Swarm Simulator";
-        if isfile(string.format("%s/Dropdowns.txt", FolderName)) then
-            local Contents = readfile(string.format("%s/Dropdowns.txt", FolderName))
-            for Index, Value in next, FileToTable(Contents) do
-                Saves.Dropdowns[Index]:Set(Value)
-            end
-        end
-    end)
+    -- task.spawn(function()
+    --     local FolderName = "AlphaZero/Bee Swarm Simulator";
+    --     if isfile(string.format("%s/Dropdowns.txt", FolderName)) then
+    --         local Contents = readfile(string.format("%s/Dropdowns.txt", FolderName))
+    --         for Index, Value in next, FileToTable(Contents) do
+    --             Saves.Dropdowns[Index]:Set(Value)
+    --         end
+    --     end
+    -- end)
 
     LoadToggles = false;
 end
