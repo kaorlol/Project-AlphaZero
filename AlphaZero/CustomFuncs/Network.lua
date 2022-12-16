@@ -2,12 +2,10 @@ local NotificationLib = loadstring(game:HttpGet("https://raw.githubusercontent.c
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
 LocalPlayer.CharacterAdded:Connect(function(Char)
 	Character = Char
-	Humanoid = Char:WaitForChild("Humanoid")
 	HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
 end)
 
@@ -55,23 +53,6 @@ local Network = {}; do
             TrueText = "Yes",
             FalseText = "No"
         })
-    end
-    function Network:TweenTo(CFrame, Time)
-        local TweenService = game:GetService("TweenService")
-        local TweenInfo = TweenInfo.new(Time, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-        local Tween = TweenService:Create(HumanoidRootPart, TweenInfo, {CFrame = CFrame})
-        Tween:Play()
-        Tween.Completed:Wait()
-    end
-    function Network:MoveTo(Position)
-        local PathfindingService = game:GetService("PathfindingService")
-        local Path = PathfindingService:CreatePath()
-        Path:ComputeAsync(HumanoidRootPart.Position, Position)
-        local Waypoints = Path:GetWaypoints()
-
-        for _, Waypoint in next, Waypoints do
-            Humanoid:MoveTo(Waypoint.Position)
-        end
     end
     function Network:TeleportTo(CFrame)
         HumanoidRootPart.CFrame = CFrame
@@ -121,6 +102,30 @@ local Network = {}; do
 			end
 			task.spawn(DiscordInviteRequest)
 		end
+    end
+    function Network:QueueOnTeleport(Code)
+        if identifyexecutor() == "Synapse X" then
+            pcall(function() 
+                syn.queue_on_teleport(Code);
+            end)
+        else
+            local _, RetryError = pcall(function()
+                queue_on_teleport(Code);
+            end)
+
+            if RetryError then
+                self:Notify("Error", "Failed to queue teleport, retrying...", 5)
+
+                local _, Error = pcall(function()
+                    queue_on_teleport(Code);
+                end)
+
+                if Error then
+                    self:Notify("Error", "Failed to queue teleport.", 5)
+                    warn(string.format("Failed to queue teleport: %s", Error))
+                end
+            end
+        end
     end
 end
 return Network
