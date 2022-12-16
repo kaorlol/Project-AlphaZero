@@ -135,7 +135,7 @@ local Webhook = {}; do
         if isfile(Path) then
             Webhook = readfile(Path)
 
-            local Response, Error = Request({
+            local Response,_ = Request({
                 Url = Webhook,
                 Method = "GET",
                 Headers = {
@@ -143,11 +143,9 @@ local Webhook = {}; do
                 }
             })
 
-            if not Error then
-                print(string.format("Response: %s : Error: %s", Response, Error))
+            if Response then
                 Exists = true;
             else
-                print(string.format("Response: %s : Error: %s", Response, Error))
                 Exists = false;
                 Network:Notify("Error", "The saved webhook is invalid, please enter a new one and save it", 5)
             end
