@@ -196,8 +196,6 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                         task.wait(1.5);
 
-                        ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
-
                         BreakCheck = false;
                         MarkerFound = false;
                         Rating, Client = GetBestRating();
@@ -218,6 +216,11 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
                         local Marker = workspace.ParkingMarkers.ParkingMarker;
                         BreakCheck = true;
                         Vehicle:PivotTo(Marker.Part.CFrame * CFrame.new(0, 1, 0));
+
+                        local OldTick = tick();
+                        if OldTick - tick() >= 5 then
+                            ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
+                        end
 
                         task.spawn(function()
                             while BreakCheck do task.wait(0.1)
