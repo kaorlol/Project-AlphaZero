@@ -196,6 +196,8 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                         task.wait(1.5);
 
+                        ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
+
                         BreakCheck = false;
                         MarkerFound = false;
                         Rating, Client = GetBestRating();
