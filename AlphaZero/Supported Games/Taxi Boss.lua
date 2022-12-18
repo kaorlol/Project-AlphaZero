@@ -98,11 +98,10 @@ end
 
 local function GetBestCar()
     local CarIds = GetOwnedCars();
-    local Rating, CarId = nil, nil;
     local RatingsAndIds = {};
     for _, Car in next, CarList do
         if table.find(CarIds, Car.id) then
-            table.insert(RatingsAndIds, string.format("%s:%s", Car.rating, Car.id))
+            table.insert(RatingsAndIds, string.format("%s:%s:%s", Car.rating, Car.id, Car.name))
         end
     end
 
@@ -110,16 +109,20 @@ local function GetBestCar()
         return a:split(":")[1] > b:split(":")[1]
     end)
 
-    Rating, CarId = RatingsAndIds[1]:split(":")[1], RatingsAndIds[1]:split(":")[2];
+    Rating, CarId, CarName = RatingsAndIds[1]:split(":")[1], RatingsAndIds[1]:split(":")[2], RatingsAndIds[1]:split(":")[3];
 
-    return Rating, CarId;
+    return Rating, CarId, CarName;
 end
 
 if LocalPlayer.variables.inCar.Value == false then
-    local _, CarId = GetBestCar();
+    local _, CarId, CarName = GetBestCar();
     LocalPlayer.PlayerScripts.CarSpawner.SpawnCar:Fire(tonumber(CarId));
     task.wait(1);
     ReplicatedStorage.Vehicles.EnterVehicleEvent:InvokeServer();
+
+    if workspace.Vehicles[CarName].REAL.SEAT:FindFirstChild("EnterPrompt") then
+        workspace.Vehicles[CarName].REAL.SEAT.EnterPrompt.Enabled = false;
+    end
 end
 
 repeat task.wait() until LocalPlayer.variables.inCar.Value
