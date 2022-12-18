@@ -114,6 +114,13 @@ local function GetBestCar()
     return Rating, CarId, CarName;
 end
 
+if LocalPlayer:FindFirstChild("IntroGui") then
+    task.wait(1)
+    firesignal(PlayerGui.IntroGui.Frame.PlayButton.MouseButton1Click)
+end
+
+repeat task.wait() until LocalPlayer:FindFirstChild("variables");
+
 if LocalPlayer.variables.inCar.Value == false then
     local _, CarId, CarName = GetBestCar();
     if not workspace.Vehicles:FindFirstChild(CarName) then
@@ -150,19 +157,14 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
         local BreakCheck = false;
 
         task.spawn(function()
-            if AutoFarmToggle then
-                Rating, Client = GetBestRating();
-                Seat, Vehicle = GetVehicle();
-                MarkerFound = false;
-                BreakCheck = false;
-
-                if Client:FindFirstChild("nameValue") then
-                    Utils.Network:Notify("Client Found...", string.format("Client: %s, Client Rating: %s", Client.nameValue.Value, tostring(Rating)), 10);
-                    AutoFarmStatus:Set(string.format("Status: Running! | Client: %s, Client Rating: %s", Client.nameValue.Value, tostring(Rating)))
-                end
-            end
-
             while true do task.wait()
+                if not AutoFarmToggle then
+                    AutoFarmStatus:Set("Status: Not Running!")
+                    VirtualUser:CaptureController();
+                    VirtualUser:SetKeyUp(Bind);
+                    break;
+                end
+
                 if LocalPlayer.variables.inCar.Value == false then
                     local _, CarId, CarName = GetBestCar();
                     if not workspace.Vehicles:FindFirstChild(CarName) then
@@ -178,15 +180,10 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                 repeat task.wait() until LocalPlayer.variables.inCar.Value;
 
-                if not AutoFarmToggle then
-                    AutoFarmStatus:Set("Status: Not Running!")
-                    VirtualUser:CaptureController();
-                    VirtualUser:SetKeyUp(Bind);
-                    break;
-                end
-
                 Rating, Client = GetBestRating();
                 Seat, Vehicle = GetVehicle();
+                MarkerFound = false;
+                BreakCheck = false;
 
                 if workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
                     MarkerFound = true;
