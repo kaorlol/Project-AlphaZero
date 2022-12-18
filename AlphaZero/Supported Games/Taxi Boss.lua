@@ -157,6 +157,10 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
         local BreakCheck = false;
 
         task.spawn(function()
+            if AutoFarmToggle then
+                AutoFarmStatus:Set("Status: Running!")
+            end
+
             while true do task.wait()
                 if not AutoFarmToggle then
                     AutoFarmStatus:Set("Status: Not Running!")
@@ -189,8 +193,6 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                 if MarkerFound then
                     task.wait(7.5);
-
-                    ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
 
                     if not workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
 
