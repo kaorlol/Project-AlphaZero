@@ -116,7 +116,9 @@ end
 
 if LocalPlayer.variables.inCar.Value == false then
     local _, CarId, CarName = GetBestCar();
-    LocalPlayer.PlayerScripts.CarSpawner.SpawnCar:Fire(tonumber(CarId));
+    if not workspace.Vehicles:FindFirstChild(CarName) then
+        LocalPlayer.PlayerScripts.CarSpawner.SpawnCar:Fire(tonumber(CarId));
+    end
     task.wait(1);
     ReplicatedStorage.Vehicles.EnterVehicleEvent:InvokeServer();
 
@@ -125,7 +127,7 @@ if LocalPlayer.variables.inCar.Value == false then
     end
 end
 
-repeat task.wait() until LocalPlayer.variables.inCar.Value
+repeat task.wait() until LocalPlayer.variables.inCar.Value;
 
 local SavedToggles = {
     AutoFarm = nil;
@@ -161,6 +163,21 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
             end
 
             while true do task.wait()
+                if LocalPlayer.variables.inCar.Value == false then
+                    local _, CarId, CarName = GetBestCar();
+                    if not workspace.Vehicles:FindFirstChild(CarName) then
+                        LocalPlayer.PlayerScripts.CarSpawner.SpawnCar:Fire(tonumber(CarId));
+                    end
+                    task.wait(1);
+                    ReplicatedStorage.Vehicles.EnterVehicleEvent:InvokeServer();
+                
+                    if workspace.Vehicles[CarName].REAL.SEAT:FindFirstChild("EnterPrompt") then
+                        workspace.Vehicles[CarName].REAL.SEAT.EnterPrompt.Enabled = false;
+                    end
+                end
+
+                repeat task.wait() until LocalPlayer.variables.inCar.Value;
+
                 if not AutoFarmToggle then
                     AutoFarmStatus:Set("Status: Not Running!")
                     VirtualUser:CaptureController();
