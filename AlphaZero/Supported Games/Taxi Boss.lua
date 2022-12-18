@@ -191,6 +191,8 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                 if MarkerFound then
                     task.wait(7.5);
+                    
+                    ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
 
                     if not workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
 
