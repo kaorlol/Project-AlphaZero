@@ -193,6 +193,7 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                 if MarkerFound then
                     task.wait(7.5);
+                    local OldTick = tick();
 
                     if not workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
 
@@ -219,9 +220,8 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
                         BreakCheck = true;
                         Vehicle:PivotTo(Marker.Part.CFrame * CFrame.new(0, 1, 0));
 
-                        local OldTick = tick();
                         if OldTick - tick() >= 5 then
-                            ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
+                            workspace.ParkingMarkers:FindFirstChild("ParkingMarker"):Destroy();
                         end
 
                         task.spawn(function()
