@@ -182,8 +182,6 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                 Rating, Client = GetBestRating();
                 Seat, Vehicle = GetVehicle();
-                MarkerFound = false;
-                BreakCheck = false;
 
                 if workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
                     MarkerFound = true;
@@ -191,7 +189,7 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
 
                 if MarkerFound then
                     task.wait(7.5);
-                    
+
                     ReplicatedStorage.CustomerMissions.CustomerMissionEnd:InvokeServer()
 
                     if not workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
