@@ -132,8 +132,8 @@ local function TweenCar(Position)
     local Seat,_ = GetVehicle();
     local Distance = (Seat.Position - Position).Magnitude;
     local Time = Distance / 250;
-    Tween = TweenService:Create(CFrameValue, TweenInfo.new(Time, Enum.EasingStyle.Linear), {Value = CFrame.new(Position) * CFrame.new(0, 500, 0)})
-    StabilizerTween = TweenService:Create(CFrameValue, TweenInfo.new(0.25, Enum.EasingStyle.Linear), {Value = CFrame.new(Position) * CFrame.new(0, 500, 0)})
+    Tween = TweenService:Create(CFrameValue, TweenInfo.new(Time, Enum.EasingStyle.Linear), {Value = CFrame.new(Position) * CFrame.new(0, 300, 0)})
+    StabilizerTween = TweenService:Create(CFrameValue, TweenInfo.new(0.25, Enum.EasingStyle.Linear), {Value = CFrame.new(Position) * CFrame.new(0, 300, 0)})
     Tween:Play();
     Tween.Completed:Connect(function()
         for _, Part in next, workspace:GetDescendants() do
@@ -273,7 +273,7 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
                             end
                         end
 
-                        Vehicle:PivotTo(Seat.CFrame * CFrame.new(0, 500, 0));
+                        Vehicle:PivotTo(Seat.CFrame * CFrame.new(0, 300, 0));
                         local Time = (Marker.Part.Position - Seat.Position).Magnitude / 250;
                         TweenCar(Marker.Part.Position);
                         task.wait(Time + 1);
@@ -282,16 +282,16 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
                         Vehicle:PivotTo(Marker.Part.CFrame * CFrame.new(0, 0, 0));
                         task.wait(5);
 
-                        -- task.spawn(function()
-                        --     while BreakCheck do task.wait(0.1)
-                        --         VirtualUser:CaptureController();
-                        --         if not BreakCheck then
-                        --             VirtualUser:SetKeyUp(Bind);
-                        --             break;
-                        --         end
-                        --         VirtualUser:SetKeyDown(Bind);
-                        --     end
-                        -- end)
+                        task.spawn(function()
+                            while BreakCheck do task.wait(0.1)
+                                VirtualUser:CaptureController();
+                                if not BreakCheck then
+                                    VirtualUser:SetKeyUp(Bind);
+                                    break;
+                                end
+                                VirtualUser:SetKeyDown(Bind);
+                            end
+                        end)
                     end
                 end
 
