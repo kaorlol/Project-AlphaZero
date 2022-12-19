@@ -17,6 +17,8 @@ local VirtualUser = game:GetService("VirtualUser");
 local Binds = require(LocalPlayer.PlayerScripts.Keybinds);
 local Bind = "0x"..string.format("%X", Binds.handbrake.Value);
 local CarList = require(ReplicatedStorage.ModuleLists.CarList);
+local TweenService = game:GetService("TweenService");
+local CFrameValue = Instance.new("CFrameValue");
 
 local MarketplaceService = game:GetService("MarketplaceService");
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name;
@@ -109,13 +111,48 @@ local function GetBestCar()
         return a:split(":")[1] > b:split(":")[1]
     end)
 
-    Rating, CarId, CarName = RatingsAndIds[1]:split(":")[1], RatingsAndIds[1]:split(":")[2], RatingsAndIds[1]:split(":")[3];
+    local Rating, CarId, CarName = RatingsAndIds[1]:split(":")[1], RatingsAndIds[1]:split(":")[2], RatingsAndIds[1]:split(":")[3];
 
     return Rating, CarId, CarName;
 end
 
+local Tween;
+local StabilizerTween;
+
+local function BreakTweens()
+    if Tween then
+        Tween:Cancel();
+    end
+    if StabilizerTween then
+        StabilizerTween:Cancel();
+    end
+end
+
+local function TweenCar(Position)
+    local Seat,_ = GetVehicle();
+    local Distance = (Seat.Position - Position).Magnitude;
+    local Time = Distance / 250;
+    Tween = TweenService:Create(CFrameValue, TweenInfo.new(Time, Enum.EasingStyle.Linear), {Value = CFrame.new(Position) * CFrame.new(0, 500, 0)})
+    StabilizerTween = TweenService:Create(CFrameValue, TweenInfo.new(0.25, Enum.EasingStyle.Linear), {Value = CFrame.new(Position) * CFrame.new(0, 500, 0)})
+    Tween:Play();
+    Tween.Completed:Connect(function()
+        for _, Part in next, workspace:GetDescendants() do
+            if Part:IsA("Part") then
+                Part.CanCollide = true;
+            end
+        end
+        Seat.Velocity = Vector3.new(0, 0, 0)
+        StabilizerTween:Play();
+        BreakTweens();
+    end)
+    StabilizerTween.Completed:Connect(function()
+        Seat.Velocity = Vector3.new(0, 0, 0)
+        BreakTweens();
+    end)
+end
+
 if LocalPlayer:FindFirstChild("IntroGui") then
-    task.wait(1)
+    task.wait(3)
     firesignal(PlayerGui.IntroGui.Frame.PlayButton.MouseButton1Click)
 end
 
@@ -162,6 +199,7 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
             end
 
             while true do task.wait()
+                task.wait(1);
                 if not AutoFarmToggle then
                     AutoFarmStatus:Set("Status: Not Running!")
                     VirtualUser:CaptureController();
@@ -187,13 +225,23 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
                 Rating, Client = GetBestRating();
                 Seat, Vehicle = GetVehicle();
 
+                CFrameValue.Value = Vehicle:GetPrimaryPartCFrame()
+                task.spawn(function()
+                    CFrameValue:GetPropertyChangedSignal("Value"):Connect(function()
+                        Vehicle:SetPrimaryPartCFrame(CFrameValue.Value)
+                        VirtualUser:CaptureController()
+                        VirtualUser:SetKeyDown('0x130')
+                        task.wait(0.3)
+                        VirtualUser:SetKeyUp('0x130')
+                    end)
+                end)
+
                 if workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
                     MarkerFound = true;
                 end
 
                 if MarkerFound then
-                    task.wait(7.5);
-                    local OldTick = tick();
+                    task.wait(0.1);
 
                     if not workspace.ParkingMarkers:FindFirstChild("ParkingMarker") then
 
@@ -218,22 +266,32 @@ SavedToggles.AutoFarm = AutoFarm:CreateToggle({
                     else
                         local Marker = workspace.ParkingMarkers.ParkingMarker;
                         BreakCheck = true;
-                        Vehicle:PivotTo(Marker.Part.CFrame * CFrame.new(0, 1, 0));
 
-                        if OldTick - tick() >= 5 then
-                            workspace.ParkingMarkers:FindFirstChild("ParkingMarker"):Destroy();
+                        for _, Part in next, workspace:GetDescendants() do
+                            if Part:IsA("Part") then
+                                Part.CanCollide = false;
+                            end
                         end
 
-                        task.spawn(function()
-                            while BreakCheck do task.wait(0.1)
-                                VirtualUser:CaptureController();
-                                if not BreakCheck then
-                                    VirtualUser:SetKeyUp(Bind);
-                                    break;
-                                end
-                                VirtualUser:SetKeyDown(Bind);
-                            end
-                        end)
+                        Vehicle:PivotTo(Seat.CFrame * CFrame.new(0, 500, 0));
+                        local Time = (Marker.Part.Position - Seat.Position).Magnitude / 250;
+                        TweenCar(Marker.Part.Position);
+                        task.wait(Time + 1);
+                        Vehicle:PivotTo(Marker.Part.CFrame * CFrame.new(-10, 0, 0));
+                        task.wait(1);
+                        Vehicle:PivotTo(Marker.Part.CFrame * CFrame.new(0, 0, 0));
+                        task.wait(5);
+
+                        -- task.spawn(function()
+                        --     while BreakCheck do task.wait(0.1)
+                        --         VirtualUser:CaptureController();
+                        --         if not BreakCheck then
+                        --             VirtualUser:SetKeyUp(Bind);
+                        --             break;
+                        --         end
+                        --         VirtualUser:SetKeyDown(Bind);
+                        --     end
+                        -- end)
                     end
                 end
 
