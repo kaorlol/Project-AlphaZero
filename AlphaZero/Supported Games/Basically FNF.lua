@@ -54,8 +54,8 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Lemon Funky'",
-    LoadingTitle = "Lemon Funky'",
+    Name = "Basically FNF: Remix",
+    LoadingTitle = "Basically FNF: Remix",
     LoadingSubtitle = "By: Sw1ndler#7733 & Kaoru~#6438",
     Discord = {
         Enabled = true,
