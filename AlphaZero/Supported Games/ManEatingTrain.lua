@@ -32,11 +32,13 @@ function getCrates()
 end
 
 function updateTrainEsp()
-    local train = game:GetService("Workspace").Multipods.Multipod.Body.WeldedParts["Locomotive_NoWheels_Texture_01"]
-    if config.esp.train then
-        addBoxEsp(train)
-    else
-        removeItem(train)
+    if game:GetService("Workspace"):FindFirstChild("Multipods") and game:GetService("Workspace").Multipods:FindFirstChild("Multipod") then
+        local train = game:GetService("Workspace").Multipods.Multipod.Body.WeldedParts["Locomotive_NoWheels_Texture_01"]
+        if config.esp.train then
+            addBoxEsp(train)
+        else
+            removeItem(train)
+        end
     end
 end
 
@@ -138,7 +140,7 @@ end)
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Edward the Man-Eating Train",
+    Name = "Edward the Man-Eating Train - Sw1ndler",
     LoadingTitle = "Project Alpha Zero: Edward the Man-Eating Train",
     LoadingSubtitle = "By: Kaoru~#6438 and Sw1ndler#7733",
     Discord = {
