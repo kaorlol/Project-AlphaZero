@@ -152,7 +152,6 @@ local Window = Rayfield:CreateWindow({
 local Esp = Window:CreateTab("Esp")
 local Misc = Window:CreateTab("Misc")
 
-
 -- Combat
 
 -- Combat:CreateToggle({
@@ -229,6 +228,13 @@ Esp:CreateToggle({
 	Callback = function(Value)
 	    config.esp.items.ticket = Value
         updateItemEsp()
+	end
+})
+
+Misc:CreateButton({
+	Name = "Copy discord link to clipboard",
+	Callback = function()
+        setclipboard("discord.gg/JdzPVMNFwY")
 	end
 })
 
