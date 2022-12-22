@@ -190,6 +190,8 @@ Misc:CreateToggle({
 	end
 })
 
+Misc:CreateParagraph({Title = "Warning", Content = "If your gun doesent want to shoot, try retoggling instant equip"})
+
 
 --------- Misc Esp
 Esp:CreateSection("Npc's")
