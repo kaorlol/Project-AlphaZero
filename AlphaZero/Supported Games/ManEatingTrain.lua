@@ -15,7 +15,8 @@ getgenv().config = {
         silentAim = true  
     },
     infStam = false,
-    instantInteract = false
+    instantInteract = false,
+    instantEquip = false
 }
 
 function getCrates()
@@ -115,6 +116,24 @@ game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function
     end
 end)
 
+local old
+old = hookmetamethod(game, '__namecall', function(self, ...)
+   local args = {...}
+   if getnamecallmethod() == 'Invoke' and string.match(tostring(args[1]):lower(), 'equip') and config.instantEquip then
+       return
+   end
+  return old(self, ...)
+end)
+
+local old
+old = hookmetamethod(game, '__index', function(self, key)
+   if key == 'POLL_TIME' or key == 'Length' and config.instantEquip then
+       return 0
+   end
+  return old(self, key)
+end)
+
+
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
@@ -159,6 +178,14 @@ Misc:CreateToggle({
 	CurrentValue = false,
 	Callback = function(Value)
 	    config.instantInteract = Value
+	end
+})
+
+Misc:CreateToggle({
+	Name = "Instant Equip",
+	CurrentValue = false,
+	Callback = function(Value)
+	    config.instantEquip = Value
 	end
 })
 
