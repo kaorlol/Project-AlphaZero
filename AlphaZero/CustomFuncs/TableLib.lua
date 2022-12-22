@@ -16,10 +16,10 @@ local TableLib = {}; do
     end;
 
     function TableLib:CopyTable(Table)
-        return LuaEncode(Table, {
+        return setclipboard(LuaEncode(Table, {
             PrettyPrinting = true;
             IndentCount = 4;
-        })
+        }))
     end;
 end;
 return TableLib;
