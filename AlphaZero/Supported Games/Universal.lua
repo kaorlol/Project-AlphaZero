@@ -1,7 +1,7 @@
+local Utils = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/AllUtils.lua")))();
 local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
-local Humanoid = Character:WaitForChild("Humanoid");
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart");
 local VirtualUser = game:GetService("VirtualUser");
 local Camera = workspace.CurrentCamera;
@@ -21,9 +21,8 @@ local MarketplaceService = game:GetService("MarketplaceService");
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name;
 
 LocalPlayer.CharacterAdded:Connect(function(Char)
-	Character = Char
-	Humanoid = Char:WaitForChild("Humanoid")
-	HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
+	Character = Char;
+	HumanoidRootPart = Char:WaitForChild("HumanoidRootPart");
 end)
 
 LocalPlayer.Idled:Connect(function()
@@ -67,7 +66,7 @@ local function IsVisible(Player)
     return #Parts == 0;
 end
 
-local function IsTeam(Player, Toggle)
+local function IsSameTeam(Player, Toggle)
     return not Toggle or Player.Team ~= LocalPlayer.Team;
 end
 
@@ -127,7 +126,7 @@ local function Triggerbot()
     if MouseTarget and MouseTarget.Parent and MouseTarget.Parent:FindFirstChild("Humanoid") and MouseTarget.Parent:FindFirstChild("HumanoidRootPart") then
         if MouseTarget.Parent ~= LocalPlayer.Character and UIS.MouseBehavior == Enum.MouseBehavior.LockCenter then
             if Players:FindFirstChild(MouseTarget.Parent.Name) then
-                if IsAlive(Players[MouseTarget.Parent.Name]) and IsTeam(Players[MouseTarget.Parent.Name], TeamCheck) then
+                if IsAlive(Players[MouseTarget.Parent.Name]) and IsSameTeam(Players[MouseTarget.Parent.Name], TeamCheck) then
                     mouse1click()
                 end
             end
@@ -143,7 +142,7 @@ local GetClosest = {}; do
         for _, Player in next, Players:GetPlayers() do
             if Player and Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                 -- Check if the player is on your team
-                if IsTeam(Player, TeamCheck) and IsAlive(Player) and IsInFOV(Player, FOVSize, FOV) then
+                if IsSameTeam(Player, TeamCheck) and IsAlive(Player) and IsInFOV(Player, FOVSize, FOV) then
                     -- Find the distance between you and the player
                     local Distance = (HumanoidRootPart.Position - Player.Character.HumanoidRootPart.Position).Magnitude;
 
@@ -166,7 +165,7 @@ local GetClosest = {}; do
         for _, Player in next, Players:GetPlayers() do
             if Player and Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                 -- Check if the player is on your team
-                if IsTeam(Player, TeamCheck) and IsAlive(Player) then
+                if IsSameTeam(Player, TeamCheck) and IsAlive(Player) then
                     -- Find the distance between the mouse and the player
                     local Distance = (Mouse.Hit.Position - Player.Character.HumanoidRootPart.Position).Magnitude;
                     -- Check if the player is on screen
@@ -231,7 +230,7 @@ local function DrawNametag(Player)
                     local HeadPosition = Camera:WorldToViewportPoint(Player.Character.Head.Position);
 
                     -- Check if the player exists, nametags are enabled, is on the same team as the local player, is on screen, and is alive.
-                    if Player and Nametags and IsTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) and IsAlive(Player) then
+                    if Player and Nametags and IsSameTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) and IsAlive(Player) then
                         -- Set the nametag's text to the player's name, the distance to the player, and the player's health.
                         Nametag.Text = FormatNametag(Player);
                         Nametag.Font = 3
@@ -293,7 +292,7 @@ local function DrawESP(Player)
                     };
 
                     -- Check if player is on the same team and is on screen
-                    if IsTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) then
+                    if IsSameTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) then
 
                         -- Update the box
                         Box.Visible = true;
@@ -343,7 +342,7 @@ local function DrawTracer(Player)
                 -- Check if the player is valid
                 if Player and Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                     -- Check if the player is on the same team
-                    if IsTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) and Player.Character:FindFirstChild("Head") then
+                    if IsSameTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) and Player.Character:FindFirstChild("Head") then
                         -- Get the player's head position on the screen
                         local HeadPosition = Camera:WorldToViewportPoint(Player.Character.Head.Position);
 
@@ -549,7 +548,7 @@ VisualsTab:CreateToggle({
                         Chams.FillColor = Color3.fromRGB(255, 255, 255);
                         Chams.OutlineColor = ChamsColor;
                     end
-                    if Player ~= LocalPlayer and Player.Character and IsTeam(Player, TeamCheck) then
+                    if Player ~= LocalPlayer and Player.Character and IsSameTeam(Player, TeamCheck) then
                         if ChamsFolder:FindFirstChild(Player.Name) == nil then
                             local Highlight = Instance.new("Highlight");
                             Highlight.Name = Player.Name;
@@ -698,3 +697,7 @@ Credits:CreateButton({
 })
 
 Utils.Network:Notify("Loaded", string.format("Successfully Loaded AlphaZero for %s!", GameName), 5)
+
+Utils.Network:QueueOnTeleport([[
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Universal.lua")))()
+]])
