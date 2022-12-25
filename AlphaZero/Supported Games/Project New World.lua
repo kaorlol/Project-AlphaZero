@@ -7,7 +7,7 @@ local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart");
 local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local VirtualUser = game:GetService("VirtualUser");
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui");
-
+local TweenService = game:GetService("TweenService");
 
 local request = (syn and syn.request) or (http and http.request) or http_request
 local HttpService = game:GetService("HttpService")
@@ -23,6 +23,7 @@ local Client = {
         AutoEquipWeapon = false;
         Method = "Closest";
         QuestFarming = false;
+        AutoCollectChests = false;
     };
     Locals = {
         UpgradeStat = ReplicatedStorage.Replication.ClientEvents.Stats_Event;
@@ -137,16 +138,16 @@ local function NoDashCooldown()
         0.3
     }
     
-    for i,v in pairs(getconstants(dashFunction)) do
+    for i,v in pairs(debug.getconstants(dashFunction)) do
         if table.find(numbers, v) then
-            setconstant(dashFunction, i, 0)
+            debug.setconstant(dashFunction, i, 0)
         end
     end
     
     requestDash = nil
     for i,v in pairs(getgc()) do
         if type(v) == 'function' and islclosure(v) and not is_synapse_function(v) then
-            local consts = getconstants(v)
+            local consts = debug.getconstants(v)
             if table.find(consts, 'Not Enough Stamina!') and table.find(consts, 'FlyingGyro') and getinfo(v).name == 'requestDash' then
                 requestDash = v
             end
@@ -223,10 +224,20 @@ NoJumpCooldown()
 local function TweenTo(Input, Speed)
     local Speed = Speed or 500;
     local Time = (HumanoidRootPart.Position - (Input.Position)).Magnitude / Speed;
-    local Tween = game.TweenService:Create(HumanoidRootPart, TweenInfo.new(Time, Enum.EasingStyle.Linear), {CFrame = Input});
+    local Tween = TweenService:Create(HumanoidRootPart, TweenInfo.new(Time, Enum.EasingStyle.Linear), {CFrame = Input});
+    local StabilizerTween = TweenService:Create(HumanoidRootPart, TweenInfo.new(0.25, Enum.EasingStyle.Linear), {CFrame = Input});
+    local Velocity = HumanoidRootPart.AssemblyLinearVelocity;
+    HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(Velocity.X, 0, Velocity.Z);
 
     Tween:Play();
-    Tween.Completed:Wait();
+    Tween.Completed:Connect(function()
+        StabilizerTween:Play();
+        HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0);
+    end)
+
+    StabilizerTween.Completed:Connect(function()
+        HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0);
+    end)
 end;
 
 local function TeleportUnder(NPC)
@@ -379,6 +390,42 @@ local function autoQuestFarm()
             enemyLevel = acceptQuest()
         end
     end
+end
+
+local function GetChests()
+    local Chests = {};
+
+    for _, Chest in next, workspace:GetChildren() do
+        if Chest:IsA("Model") and string.find(Chest.Name, "Chest") then
+            table.insert(Chests, Chest);
+        end
+    end
+
+    return Chests;
+end
+
+local function CollectChest(Chest)
+    if Chest and Chest:FindFirstChild("Hitbox") then
+        TweenTo(Chest.Hitbox.CFrame);
+    end
+end
+
+local function GetClosestChest()
+    local ClosestChest = nil;
+    local ClosestDistance = math.huge;
+
+    for _, Chest in next, GetChests() do
+        if Chest:FindFirstChild("Hitbox") then
+            local Distance = (HumanoidRootPart.Position - Chest.Hitbox.Position).Magnitude;
+
+            if Distance < ClosestDistance then
+                ClosestChest = Chest;
+                ClosestDistance = Distance;
+            end
+        end
+    end
+
+    return ClosestChest;
 end
 
 LocalPlayer.CharacterAdded:Connect(function(Char)
@@ -656,16 +703,33 @@ MiscTab:CreateButton({
 MiscTab:CreateButton({
     Name = "Camera Noclip",
     Callback = function()
-        for i, v in next,getgc() do
-           if getfenv(v).script == LocalPlayer.PlayerScripts.PlayerModule.CameraModule.ZoomController.Popper and typeof(v) == "function" then
-               for number, value in next, getconstants(v) do
+        for i, v in next, getgc() do
+           if typeof(v) == "function" and getfenv(v).script == LocalPlayer.PlayerScripts.PlayerModule.CameraModule.ZoomController.Popper then
+               for number, value in next, debug.getconstants(v) do
                    if tonumber(value) == 0.25 then
-                       setconstant(v,number,0)
+                       debug.setconstant(v,number,0)
                    elseif tonumber(value) == 0 then
-                       setconstant(v,number,0.25)
+                        debug.setconstant(v,number,0.25)
                    end
                end
            end
         end
+    end;
+})
+
+MiscTab:CreateToggle({
+    Name = "Auto Collect Chests",
+    Callback = function(AutoCollectChestsValue)
+        Client.Toggles.AutoCollectChests = AutoCollectChestsValue;
+
+        task.spawn(function()
+            while Client.Toggles.AutoCollectChests do task.wait()
+                local Chest = GetClosestChest();
+        
+                if Chest then
+                    CollectChest(Chest);
+                end
+            end
+        end)
     end;
 })
