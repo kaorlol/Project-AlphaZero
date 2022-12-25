@@ -1,10 +1,3 @@
-local FolderName = "AlphaZero/Project New World";
-if not isfolder("AlphaZero") then
-    makefolder("AlphaZero")
-elseif not isfolder("AlphaZero/Project New World") then
-    makefolder("AlphaZero/Project New World")
-end
-
 local Utils = loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/AllUtils.lua")))();
 local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
@@ -57,10 +50,6 @@ local function getIsland()
     end
 
     for i,v in pairs(game:GetService("Workspace")["NPC Zones"]:GetChildren()) do
-        if v.Name == "Desert Ruins" then
-           return v
-        end
-        
         if table.find(islands, v.Name) then
             return v
         end
@@ -668,7 +657,7 @@ MiscTab:CreateButton({
     Name = "Camera Noclip",
     Callback = function()
         for i, v in next,getgc() do
-           if getfenv(v).script == game.Players.LocalPlayer.PlayerScripts.PlayerModule.CameraModule.ZoomController.Popper and typeof(v) == "function" then
+           if getfenv(v).script == LocalPlayer.PlayerScripts.PlayerModule.CameraModule.ZoomController.Popper and typeof(v) == "function" then
                for number, value in next, getconstants(v) do
                    if tonumber(value) == 0.25 then
                        setconstant(v,number,0)
