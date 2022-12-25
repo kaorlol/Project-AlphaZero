@@ -21,17 +21,6 @@ local HttpService = game:GetService("HttpService")
 local MarketplaceService = game:GetService("MarketplaceService");
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name;
 
-LocalPlayer.CharacterAdded:Connect(function(Char)
-	Character = Char
-	Humanoid = Char:WaitForChild("Humanoid")
-	HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
-end)
-
-LocalPlayer.Idled:Connect(function()
-    VirtualUser:CaptureController();
-    VirtualUser:ClickButton2(Vector2.new(0,0));
-end)
-
 local Client = {
     Toggles = {
         AutoAttack = false;
@@ -54,6 +43,12 @@ local Client = {
 };
 
 local SelectedWeapon;
+local CombatToggleTable;
+
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController();
+    VirtualUser:ClickButton2(Vector2.new(0,0));
+end)
 
 local function getIsland()
     local islands = {}
@@ -393,7 +388,28 @@ local function autoQuestFarm()
     end
 end
 
-local CombatToggleTable = nil;
+LocalPlayer.CharacterAdded:Connect(function(Char)
+	Character = Char
+	Humanoid = Char:WaitForChild("Humanoid")
+	HumanoidRootPart = Char:WaitForChild("HumanoidRootPart")
+
+    Humanoid.Died:Connect(function()
+        if Client.Toggles.AutoAttack then
+            task.wait(8);
+
+            CombatToggleTable:Set(true);
+        end
+
+        if Client.Toggles.QuestFarming then
+            Client.Toggles.QuestFarming = false;
+            task.wait(8);
+            Client.Toggles.QuestFarming = true;
+
+            autoQuestFarm();
+        end
+    end)
+end)
+
 Humanoid.Died:Connect(function()
     if Client.Toggles.AutoAttack then
         task.wait(8);
