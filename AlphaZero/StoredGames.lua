@@ -6,6 +6,5 @@ return {
     ["6679968919"] = "Fly%20Race";
     ["1537690962"] = "Bee%20Swarm%20Simulator";
     ["7305309231"] = "Taxi%20Boss";
-    ['6520999642'] = "Basically%20FNF";
-    ['10875701453'] = "ManEatingTrain";
+    ["6918802270"] = "Project%20New%20World";
 }
