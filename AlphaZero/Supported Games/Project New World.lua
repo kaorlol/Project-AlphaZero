@@ -310,11 +310,9 @@ local function acceptQuest()
     while success ~= true do
         success = pcall(function()
             LocalPlayer.PlayerGui.QuestGui.QuestFunction:InvokeServer(npc, levelStr)
-            print("Getting quest")
         end)
         task.wait()
     end
-    print("got quest", level)
 
     return level
 end
@@ -355,9 +353,7 @@ local function autoQuestFarm()
         end
 
         if questData.NPCName.Value ~= "" and enemyLevel then
-            print("Getting enemy")
             local npc = getClosestQuestEnemy(enemyLevel)
-            print("Got enemy")
 
             if npc == nil then
                 repeat
@@ -392,7 +388,6 @@ local function autoQuestFarm()
             end
         else
             enemyLevel = acceptQuest()
-            print("Getting quest")
         end
     end
 end
