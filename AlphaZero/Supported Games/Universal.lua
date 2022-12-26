@@ -185,7 +185,7 @@ local function FormatNametag(Player)
     -- Check if the player exists and is valid
     if Player and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") and Player.Character:FindFirstChild("Humanoid") then
         -- Check if the player is dead
-        if Player.Character.Humanoid.Health <= 0 then
+        if not IsAlive(Player) or Player.Character.Humanoid.Health <= 0 then
             return ("[0] " .. Player.Name .. "| %sHP"):format(Player.Character.Humanoid.Health)
         end
 
@@ -292,7 +292,7 @@ local function DrawESP(Player)
                     };
 
                     -- Check if player is on the same team and is on screen
-                    if IsSameTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) then
+                    if IsSameTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) and IsAlive(Player) then
 
                         -- Update the box
                         Box.Visible = true;
@@ -438,7 +438,7 @@ local AimbotTab = Window:CreateTab("Aimbot");
 AimbotTab:CreateSection("Aimbot Toggles");
 
 local Smoothness = 0.25;
-local TargetPart = "HumanoidRootPart";
+local TargetPart = "Head";
 
 AimbotTab:CreateDropdown({
     Name = "Aimbot Method";
@@ -655,9 +655,13 @@ VisualsTab:CreateSlider({
 Players.PlayerAdded:Connect(function(Player)
     if ESPToggle then
         DrawESP(Player);
-    elseif Tracers then
+    end
+
+    if Tracers then
         DrawTracer(Player);
-    elseif Nametags then
+    end
+
+    if Nametags then
         DrawNametag(Player);
     end
 end)
@@ -681,15 +685,16 @@ VisualsTab:CreateColorPicker({
     end;
 })
 
-Credits:CreateSection('Credits')
+local CreditsTab = Window:CreateTab("Credits");
+CreditsTab:CreateSection('Credits')
 
-Credits:CreateParagraph({
+CreditsTab:CreateParagraph({
     Title = "Who made this script?",
     Content = "Main Devs: Kaoru#6438 and Sw1ndler#7733; UI Dev: shlex#9425",
 })
 
-Credits:CreateSection('Discord')
-Credits:CreateButton({
+CreditsTab:CreateSection('Discord')
+CreditsTab:CreateButton({
     Name = 'Join Discord',
     Callback = function()
         Utils.Network:SendInvite("JdzPVMNFwY")
