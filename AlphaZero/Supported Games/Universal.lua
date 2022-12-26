@@ -704,5 +704,7 @@ CreditsTab:CreateButton({
 Utils.Network:Notify("Loaded", string.format("Successfully Loaded AlphaZero for %s!", GameName), 5)
 
 Utils.Network:QueueOnTeleport([[
+    repeat task.wait() until game:IsLoaded()
+
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Universal.lua")))()
 ]])
