@@ -24,6 +24,8 @@ local Client = {
         Method = "Closest";
         QuestFarming = false;
         AutoCollectChests = false;
+        FarmDistance = 8.3;
+        QuestFarmMethod = "Below"
     };
     Locals = {
         UpgradeStat = ReplicatedStorage.Replication.ClientEvents.Stats_Event;
@@ -45,13 +47,15 @@ LocalPlayer.Idled:Connect(function()
 end)
 
 local function getIsland()
-    local islands = {}
-    for i,v in pairs(game:GetService("Workspace").Islands:GetChildren()) do
-        table.insert(islands, v.Name)
-    end
+    local notIslands = {
+        "Monsters",
+        "Spawned",
+        "Super Bosses",
+        "SpecialBosses"
+    }
 
     for i,v in pairs(game:GetService("Workspace")["NPC Zones"]:GetChildren()) do
-        if table.find(islands, v.Name) then
+        if table.find(notIslands, v.Name) == nil then
             return v
         end
     end
@@ -353,12 +357,21 @@ local function getClosestQuestEnemy(level)
     return closest
 end
 
-
 local function autoQuestFarm()
     local questData = LocalPlayer.Quest
     local enemyLevel
 
     local tool = SelectedWeapon;
+    local distance = Client.Toggles.FarmDistance
+    local orientation = 90
+    
+    if Client.Toggles.QuestFarmMethod == "Below" then
+        distance = distance * -1
+    end
+    
+    if Client.Toggles.QuestFarmMethod == "Above" then
+        orientation = -90
+    end
 
     while Client.Toggles.QuestFarming and task.wait() do
         local equippedTool = LocalPlayer.Character:FindFirstChildWhichIsA("Tool")
@@ -386,18 +399,20 @@ local function autoQuestFarm()
 
             if npc and npc:FindFirstChild("HumanoidRootPart") and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 npc.HumanoidRootPart.Size = Vector3.new(10, 10, 10)
-                TweenTo(npc.HumanoidRootPart.CFrame)
+                TweenTo(npc.HumanoidRootPart.CFrame * CFrame.new(0, distance, 0))
             else
                 break
             end
+            
+            LocalPlayer.Character:FindFirstChildWhichIsA("Tool"):Activate()
 
-            local orgin = npc.HumanoidRootPart.CFrame * CFrame.new(0, -8, 0)
+            local orgin = npc.HumanoidRootPart.CFrame * CFrame.new(0, distance, 0)
             while npc.Parent ~= nil and npc:FindFirstChild("HumanoidRootPart") and Client.Toggles.QuestFarming and task.wait() do
                 local x = pcall(function()
                     local npcFrame = npc.HumanoidRootPart.CFrame
                     npc.HumanoidRootPart.Size = Vector3.new(10, 10, 10)
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(npcFrame.X, orgin.Y, npcFrame.Z) * CFrame.Angles(math.rad(90), 0, 0)
-                    equippedTool:Activate()
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(npcFrame.X, orgin.Y, npcFrame.Z) * CFrame.Angles(math.rad(orientation), 0, 0)
+                    LocalPlayer.Character:FindFirstChildWhichIsA("Tool"):Activate()
                 end)
                 if x == false then break end;
             end
@@ -580,7 +595,7 @@ FarmingTab:CreateToggle({
 })
 
 local QuestTab = Window:CreateTab("Quests");
-QuestTab:CreateSection("Auto Quest");
+QuestTab:CreateSection("Main");
 
 QuestTab:CreateToggle({
 	Name = "Quest Farm (Gets Best Quest)",
@@ -592,6 +607,33 @@ QuestTab:CreateToggle({
         end
 	end
 })
+
+QuestTab:CreateSection("Method")
+
+QuestTab:CreateDropdown({
+    Name = "Method",
+    Options = {
+        "Above",
+        "Below"
+    },
+    CurrentOption = "Below",
+    Callback = function(MethodValue)
+        Client.Toggles.QuestFarmMethod = MethodValue;
+    end;
+})
+
+QuestTab:CreateSlider({
+   Name = "Distance",
+   Range = {0, 25},
+   Increment = 0.1,
+   Suffix = "Studs",
+   CurrentValue = 8.3,
+   Callback = function(Value)
+        Client.Toggles.FarmDistance = Value
+   end,
+})
+
+QuestTab:CreateSection("Weapon")
 
 local function GetWeapons()
     local Weapons = {};
