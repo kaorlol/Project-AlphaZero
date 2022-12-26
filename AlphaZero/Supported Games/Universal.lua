@@ -30,6 +30,77 @@ LocalPlayer.Idled:Connect(function()
     VirtualUser:ClickButton2(Vector2.new(0,0));
 end)
 
+local GroupService = game:GetService("GroupService")
+local CreatorId, PlaceId, JobId = game.CreatorId, game.PlaceId, game.JobId;
+local TeleportService = game:GetService("TeleportService");
+local HttpService = game:GetService("HttpService");
+local Request = (syn and syn.request) or (http and http.request) or http_request;
+
+local GroupId = nil;
+if Players:GetPlayerByUserId(CreatorId) == nil then
+    local Group = GroupService:GetGroupInfoAsync(CreatorId);
+    GroupId = Group.Id;
+end
+
+local function GetWorstRank()
+    local WorstRank = math.huge;
+    local Group = GroupService:GetGroupInfoAsync(CreatorId);
+
+    for _, Rank in next, Group.Roles do
+        if Rank.Rank < WorstRank then
+            WorstRank = Rank.Rank;
+        end
+    end
+
+    return WorstRank;
+end
+
+local function IsAdmin(Player)
+    local UserId = Player.UserId;
+
+    if UserId == CreatorId then
+        return true;
+    elseif GroupId ~= nil then
+        local InGroup = Player:IsInGroup(CreatorId);
+        local GroupRank = Player:GetRankInGroup(GroupId);
+        local WorstRank = GetWorstRank();
+
+        if InGroup and GroupRank > WorstRank then
+            return true;
+        end
+    end
+
+    return false;
+end
+
+local function ServerHop()
+    local Servers = {};
+    local Response = Request({Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", PlaceId)});
+    local Body = HttpService:JSONDecode(Response.Body);
+
+    if Body and Body.data then
+        for _, Server in next, Body.data do
+            if type(Server) == "table" and tonumber(Server.playing) and tonumber(Server.maxPlayers) and Server.playing < Server.maxPlayers and Server.id ~= JobId then
+                table.insert(Servers, 1, Server.id);
+            end
+        end
+    end
+
+    if #Servers > 0 then
+        TeleportService:TeleportToPlaceInstance(PlaceId, Servers[math.random(1, #Servers)], LocalPlayer);
+        Utils.Network:QueueOnTeleport([[
+            repeat task.wait() until game:IsLoaded()
+
+            local Network = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua")))();
+            Network:Notify("Server Hop", "Successfully Hopped To New Server", 5);
+
+            loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Universal.lua")))()
+        ]])
+    else
+        Utils.Network:Notify("Server Hop", "No servers found to hop to", 10);
+    end
+end
+
 local function GetCorners(Part)
     local Size = Part.Size * Vector3.new(1, 1.5)
     return {
@@ -78,18 +149,6 @@ end
 
 local function DoChecks(Player)
     return Player and IsHolding() and IsVisible(Player);
-end
-
-local function AimAt(Player, TargetPart, Smoothness)
-    Player = Player or error("No player provided");
-    TargetPart = TargetPart or "Head";
-    Smoothness = Smoothness or 1;
-
-    if Player and Player.Character and Player.Character:FindFirstChild(TargetPart) then
-        if UIS.MouseBehavior == Enum.MouseBehavior.LockCenter then
-            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, Player.Character[TargetPart].Position), Smoothness);
-        end
-    end
 end
 
 local function Triggerbot()
@@ -179,6 +238,25 @@ local GetClosest = {}; do
 
         return ClosestPlayer;
     end;
+
+    function GetClosest:PartFromMouse(Player)
+        local ClosestPart = nil;
+        local ClosestDistance = math.huge;
+
+        for _, Part in next, Player.Character:GetChildren() do
+            if Part:IsA("BasePart") then
+                -- Find the distance between the mouse and the part
+                local Distance = (Mouse.Hit.Position - Part.Position).Magnitude;
+                -- Check if the part is on screen
+                if Distance < ClosestDistance and IsOnScreen(Part) then
+                    ClosestPart = Part.Name;
+                    ClosestDistance = Distance;
+                end
+            end
+        end
+
+        return ClosestPart;
+    end
 end
 
 local function FormatNametag(Player)
@@ -408,6 +486,22 @@ local function DrawFOV()
     coroutine.wrap(UpdateFOV)();
 end
 
+local function AimAt(Player, TargetPart, Smoothness)
+    Player = Player or error("No player provided");
+    TargetPart = TargetPart or "Head";
+    Smoothness = Smoothness or 1;
+
+    if TargetPart == "Get Closest Part From Mouse" then
+        TargetPart = GetClosest:PartFromMouse(Player);
+    end
+
+    if Player and Player.Character and Player.Character:FindFirstChild(TargetPart) then
+        if UIS.MouseBehavior == Enum.MouseBehavior.LockCenter then
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, Player.Character[TargetPart].Position), Smoothness);
+        end
+    end
+end
+
 Instance.new("ScreenGui", game.CoreGui).Name = "Kaoru"
 local ChamsFolder = Instance.new("Folder")
 ChamsFolder.Name = "ChamsFolder"
@@ -506,7 +600,7 @@ AimbotTab:CreateToggle({
 
 local TargetPartDropdown = AimbotTab:CreateDropdown({
     Name = "Target Part";
-    Options = {"Head", "HumanoidRootPart"};
+    Options = {"Head", "HumanoidRootPart", "Get Closest Part From Mouse"};
     CurrentOption = "Head";
     Callback = function(TargetPartValue)
         TargetPart = TargetPartValue;
@@ -738,13 +832,43 @@ ConfigTab:CreateButton({
             TracersToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
-            TargetPartDropdown:Set("HumanoidRootPart");
-            AimbotSmoothness:Set(0.05)
+            TargetPartDropdown:Set("Get Closest Part From Mouse");
+            AimbotSmoothness:Set(0.1)
         elseif SelectedConfig == "None" then
             return Utils.Network:Notify("Error", "Please select a valid config!", 5)
         end
     end;
 })
+
+local GroupTab = Window:CreateTab("Group Tools");
+GroupTab:CreateSection('Admin Detecter')
+
+local AdminDetecterToggle = false;
+GroupTab:CreateToggle({
+    Name = "Admin Detecter (Not 100% Accurate)";
+    CurrentValue = false;
+    Callback = function(AdminDetecterValue)
+        AdminDetecterToggle = AdminDetecterValue;
+
+        if AdminDetecterToggle then
+            for _, Player in next, Players:GetPlayers() do
+                if IsAdmin(Player) then
+                    LocalPlayer:Kick(string.format("Admin Detected (%s), Server Hopping...", Player.Name));
+                    ServerHop();
+                end
+            end
+        end
+    end;
+})
+
+Players.PlayerAdded:Connect(function(Player)
+    if AdminDetecterToggle then
+        if IsAdmin(Player) then
+            LocalPlayer:Kick(string.format("Admin Detected (%s), Server Hopping...", Player.Name));
+            ServerHop();
+        end
+    end
+end)
 
 local CreditsTab = Window:CreateTab("Credits");
 CreditsTab:CreateSection('Credits')
