@@ -462,7 +462,7 @@ AimbotTab:CreateDropdown({
 })
 
 local AimbotToggle = false;
-AimbotTab:CreateToggle({
+local AimbotTabToggle = AimbotTab:CreateToggle({
     Name = "Aimbot";
     CurrentValue = false;
     Callback = function(AimbotValue)
@@ -480,7 +480,7 @@ AimbotTab:CreateToggle({
 })
 
 local TriggerbotToggle = false;
-AimbotTab:CreateToggle({
+local TriggerbotTabToggle = AimbotTab:CreateToggle({
     Name = "Triggerbot";
     CurrentValue = false;
     Callback = function(TriggerbotValue)
@@ -504,7 +504,7 @@ AimbotTab:CreateToggle({
     end;
 })
 
-AimbotTab:CreateDropdown({
+local TargetPartDropdown = AimbotTab:CreateDropdown({
     Name = "Target Part";
     Options = {"Head", "HumanoidRootPart"};
     CurrentOption = "Head";
@@ -513,10 +513,11 @@ AimbotTab:CreateDropdown({
     end;
 })
 
-AimbotTab:CreateSlider({
+local AimbotSmoothness = AimbotTab:CreateSlider({
     Name = "Smoothness";
     Range = {0, 1};
     Increment = 0.001;
+    Suffix = "";
     CurrentValue = 0.25;
     Callback = function(SmoothnessValue)
         Smoothness = SmoothnessValue;
@@ -527,7 +528,7 @@ local VisualsTab = Window:CreateTab("Visuals");
 VisualsTab:CreateSection("Visuals Toggles");
 
 local ChamsToggle, OldChamsColor = false, Color3.fromRGB(255, 255, 255);
-VisualsTab:CreateToggle({
+local ChamsTabToggle = VisualsTab:CreateToggle({
     Name = "Chams";
     CurrentValue = false;
     Callback = function(ChamsValue)
@@ -578,7 +579,7 @@ VisualsTab:CreateToggle({
     end;
 })
 
-VisualsTab:CreateToggle({
+local ESPTabToggle = VisualsTab:CreateToggle({
     Name = "ESP";
     CurrentValue = false;
     Callback = function(ESPValue)
@@ -592,7 +593,7 @@ VisualsTab:CreateToggle({
     end;
 })
 
-VisualsTab:CreateToggle({
+local NametagsToggle = VisualsTab:CreateToggle({
     Name = "Nametags";
     CurrentValue = false;
     Callback = function(NametagsValue)
@@ -606,7 +607,7 @@ VisualsTab:CreateToggle({
     end;
 })
 
-VisualsTab:CreateToggle({
+local TracersToggle = VisualsTab:CreateToggle({
     Name = "Tracers";
     CurrentValue = false;
     Callback = function(TracersValue)
@@ -622,7 +623,7 @@ VisualsTab:CreateToggle({
 
 VisualsTab:CreateSection("FOV & FOV Settings");
 
-VisualsTab:CreateToggle({
+local FOVToggle = VisualsTab:CreateToggle({
     Name = "Use FOV";
     CurrentValue = false;
     Callback = function(FOVValue)
@@ -642,10 +643,11 @@ VisualsTab:CreateToggle({
     end;
 })
 
-VisualsTab:CreateSlider({
+local FOVSizeSlider = VisualsTab:CreateSlider({
     Name = "FOV Size";
     Range = {0, 1000};
     Increment = 1;
+    Suffix = "";
     CurrentValue = 100;
     Callback = function(FOVSizeValue)
         FOVSize = FOVSizeValue;
@@ -668,7 +670,7 @@ end)
 
 VisualsTab:CreateSection("Visuals Settings");
 
-VisualsTab:CreateToggle({
+local RainbowEspToggle = VisualsTab:CreateToggle({
     Name = "Rainbow ESP";
     CurrentValue = false;
     Callback = function(RainbowESPValue)
@@ -682,6 +684,65 @@ VisualsTab:CreateColorPicker({
     Callback = function(ESPColorValue)
         ESPColor, OldEspColor = ESPColorValue, ESPColorValue;
         ChamsColor, OldChamsColor = ESPColorValue, ESPColorValue;
+    end;
+})
+
+local ConfigTab = Window:CreateTab("Creator Configs");
+ConfigTab:CreateSection('Configs')
+
+local SelectedConfig = "None";
+ConfigTab:CreateDropdown({
+    Name = "Config";
+    Options = {"Rage", "Semi-Legit", "Legit"};
+    CurrentOption = "None";
+    Callback = function(ConfigValue)
+        SelectedConfig = ConfigValue;
+    end;
+})
+
+ConfigTab:CreateButton({
+    Name = "Apply Config";
+    CurrentValue = false;
+    Callback = function()
+        if SelectedConfig == "Rage" then
+            AimbotTabToggle:Set(true);
+            TriggerbotTabToggle:Set(true);
+            RainbowEspToggle:Set(true);
+            FOVToggle:Set(true);
+            FOVSizeSlider:Set(1000);
+            ChamsTabToggle:Set(true);
+            TracersToggle:Set(true);
+            NametagsToggle:Set(true);
+            ESPTabToggle:Set(true);
+            TargetPartDropdown:Set("Head");
+            AimbotSmoothness:Set(1)
+        elseif SelectedConfig == "Semi-Legit" then
+            AimbotTabToggle:Set(true);
+            TriggerbotTabToggle:Set(true);
+            RainbowEspToggle:Set(true);
+            FOVToggle:Set(true);
+            FOVSizeSlider:Set(250);
+            ChamsTabToggle:Set(true);
+            TracersToggle:Set(true);
+            NametagsToggle:Set(true);
+            ESPTabToggle:Set(true);
+            TargetPartDropdown:Set("Head");
+            AimbotSmoothness:Set(0.25)
+        elseif SelectedConfig == "Legit" then
+            AimbotTabToggle:Set(true);
+            TriggerbotTabToggle:Set(false);
+            RainbowEspToggle:Set(true);
+            FOVToggle:Set(true);
+            FOVSizeSlider:Set(100);
+            ChamsTabToggle:Set(true);
+            TracersToggle:Set(true);
+            NametagsToggle:Set(true);
+            ESPTabToggle:Set(true);
+            TargetPartDropdown:Set("HumanoidRootPart");
+            AimbotSmoothness:Set(0.05)
+        elseif SelectedConfig == "None" then
+            return Utils.Network:Notify("Error", "Please select a valid config!", 5)
+        end
     end;
 })
 
