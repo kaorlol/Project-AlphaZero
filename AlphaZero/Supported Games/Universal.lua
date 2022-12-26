@@ -726,7 +726,7 @@ ConfigTab:CreateButton({
             TracersToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
-            TargetPartDropdown:Set("Head");
+            TargetPartDropdown:Set("HumanoidRootPart");
             AimbotSmoothness:Set(0.25)
         elseif SelectedConfig == "Legit" then
             AimbotTabToggle:Set(true);
