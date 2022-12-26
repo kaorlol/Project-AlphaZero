@@ -148,7 +148,7 @@ local function NoDashCooldown()
     for i,v in pairs(getgc()) do
         if type(v) == 'function' and islclosure(v) and not is_synapse_function(v) then
             local consts = debug.getconstants(v)
-            if table.find(consts, 'Not Enough Stamina!') and table.find(consts, 'FlyingGyro') and getinfo(v).name == 'requestDash' then
+            if table.find(consts, 'Not Enough Stamina!') and table.find(consts, 'FlyingGyro') and debug.getinfo(v).name == 'requestDash' then
                 requestDash = v
             end
         end
@@ -229,14 +229,29 @@ local function TweenTo(Input, Speed)
     local Velocity = HumanoidRootPart.AssemblyLinearVelocity;
     HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(Velocity.X, 0, Velocity.Z);
 
+    if (not Client.Toggles.AutoCollectChests) or (not Client.Toggles.QuestFarming) or (not Client.Toggles.AutoTeleport) then
+        Tween:Cancel();
+        StabilizerTween:Cancel();
+    end
+
     Tween:Play();
     Tween.Completed:Connect(function()
         StabilizerTween:Play();
         HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0);
+
+        if (not Client.Toggles.AutoCollectChests) or (not Client.Toggles.QuestFarming) or (not Client.Toggles.AutoTeleport) then
+            Tween:Cancel();
+            StabilizerTween:Cancel();
+        end
     end)
 
     StabilizerTween.Completed:Connect(function()
         HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0);
+
+        if (not Client.Toggles.AutoCollectChests) or (not Client.Toggles.QuestFarming) or (not Client.Toggles.AutoTeleport) then
+            Tween:Cancel();
+            StabilizerTween:Cancel();
+        end
     end)
 end;
 
@@ -722,11 +737,46 @@ MiscTab:CreateToggle({
     Callback = function(AutoCollectChestsValue)
         Client.Toggles.AutoCollectChests = AutoCollectChestsValue;
 
+        if not AutoCollectChestsValue then
+            for _, Part in next, workspace.Islands:GetDescendants() do
+                if Part:IsA("Part") or Part:IsA("BasePart") then
+                    if Part.CanCollide == false then
+                        Part.CanCollide = true;
+                    end
+                end
+            end
+        else
+            for _, Part in next, workspace.Islands:GetDescendants() do
+                if Part:IsA("Part") or Part:IsA("BasePart") then
+                    if Part.CanCollide == true then
+                        Part.CanCollide = false;
+                    end
+                end
+            end
+        end
+
         task.spawn(function()
             while Client.Toggles.AutoCollectChests do task.wait()
                 local Chest = GetClosestChest();
+
+                if not Chest then
+                    for _, Part in next, workspace.Islands:GetDescendants() do
+                        if Part:IsA("Part") or Part:IsA("BasePart") then
+                            if Part.CanCollide == false then
+                                Part.CanCollide = true;
+                            end
+                        end
+                    end
+                end
         
                 if Chest then
+                    local Distance = (LocalPlayer.Character.HumanoidRootPart.Position - Chest.Hitbox.Position).Magnitude;
+
+                    if Distance <= 5 then
+                        firetouchinterest(LocalPlayer.Character.HumanoidRootPart, Chest.Hitbox, 0);
+                        firetouchinterest(LocalPlayer.Character.HumanoidRootPart, Chest.Hitbox, 1);
+                    end
+
                     CollectChest(Chest);
                 end
             end
