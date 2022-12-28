@@ -105,7 +105,7 @@ local Network = {}; do
     end
     function Network:QueueOnTeleport(Code)
         if identifyexecutor() == "Synapse X" then
-            pcall(function() 
+            pcall(function()
                 syn.queue_on_teleport(Code);
             end)
         else
@@ -126,6 +126,55 @@ local Network = {}; do
                 end
             end
         end
+    end
+    function Network:ServerHop()
+        local TeleportService = game:GetService("TeleportService");
+        local ServerData = game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Dsc&limit=100")).data;
+
+        local c = 0;
+        for i = 1, #ServerData do
+            local Server = ServerData[i - c];
+            if not Server.playing then
+                table.remove(ServerData, i - c);
+                c += 1;
+            end
+        end
+
+        local function Shuffle(tInput)
+            local tReturn = {};
+
+            for i = #tInput, 1, -1 do
+                local j = math.random(i);
+                tInput[i], tInput[j] = tInput[j], tInput[i];
+                table.insert(tReturn, tInput[i]);
+            end
+
+            return tReturn;
+        end
+
+        ServerData = Shuffle(ServerData);
+
+        local function ServerHop(Data, Failed)
+            Failed = Failed or {};
+            for _, Server in next, Data do
+                local Id = Server.id;
+                if not Failed[Id] and Id ~= game.JobId then
+                    if Server.playing < Server.maxPlayers then
+                        local Connection; Connection = TeleportService.TeleportInitFailed:Connect(function(Player, TeleportResult, ErrorMessage)
+                            self:Notify("Error", string.format("Failed to teleport to server: %s", ErrorMessage), 5);
+
+                            Connection:Disconnect();
+                            Failed[Id] = true;
+                            ServerHop(Data, Failed);
+                        end)
+                        TeleportService:TeleportToPlaceInstance(game.PlaceId, Id);
+                        break;
+                    end
+                end
+            end
+        end
+
+        ServerHop(ServerData)
     end
 end
 return Network
