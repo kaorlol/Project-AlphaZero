@@ -3,6 +3,7 @@ local Players = game:GetService("Players");
 local LocalPlayer = Players.LocalPlayer;
 local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait();
 local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart");
+local Humanoid = Character:WaitForChild("Humanoid");
 local VirtualUser = game:GetService("VirtualUser");
 local Camera = workspace.CurrentCamera;
 local Mouse = LocalPlayer:GetMouse();
@@ -17,12 +18,39 @@ local TeamCheck = false;
 local FOV = false;
 local FOVSize, FOVFollowMouse = 100, false;
 local CornerESP = false;
+local FreeCameraToggle = false;
+
+local SprintKey = Enum.KeyCode.LeftShift;
+local MovePosition = Vector2.new(0, 0)
+local TargetMovePosition = MovePosition
+
+local Y_Sensitivity = 300;
+local X_Sensitivity = 300;
+
+local LastRightButtonDown = Vector2.new(0, 0)
+local RightMouseButtonDown = false
+
+local TargetFOV = 70
+
+local Sprinting = false;
+local SprintingSpeed = 3;
+
+local KeysDown = {};
+local KeyMappings = {
+    [Enum.KeyCode.W] = Vector3.new(0, 0, -1);
+    [Enum.KeyCode.S] = Vector3.new(0, 0, 1);
+    [Enum.KeyCode.A] = Vector3.new(-1, 0, 0);
+    [Enum.KeyCode.D] = Vector3.new(1, 0, 0);
+    [Enum.KeyCode.Space] = Vector3.new(0, 1, 0);
+    [Enum.KeyCode.LeftControl] = Vector3.new(0, -1, 0);
+};
 
 local MarketplaceService = game:GetService("MarketplaceService");
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name;
 
 LocalPlayer.CharacterAdded:Connect(function(Char)
 	Character = Char;
+    Humanoid = Char:WaitForChild("Humanoid");
 	HumanoidRootPart = Char:WaitForChild("HumanoidRootPart");
 end)
 
@@ -611,6 +639,57 @@ local function AimAt(Player, TargetPart, Smoothness)
     end
 end
 
+local function Tween(a, b, t)
+    if t == 1 then
+        return b
+    else
+        if tonumber(a) then
+            return a * (1 - t) + (b * t)
+        else
+            return a:Lerp(b, t);
+        end
+    end
+end
+
+local function CalculateMovement()
+    local NewMovement = Vector3.new(0, 0, 0)
+    for Index,_ in next, KeysDown do
+        NewMovement = NewMovement + (KeyMappings[Index] or Vector3.new(0, 0, 0))
+    end
+    return NewMovement
+end
+
+local function Input(Input)
+    if KeyMappings[Input.KeyCode] then
+        if Input.UserInputState == Enum.UserInputState.Begin then
+            KeysDown[Input.KeyCode] = true
+        elseif Input.UserInputState == Enum.UserInputState.End then
+            KeysDown[Input.KeyCode] = nil
+        end
+    else
+        if Input.UserInputState == Enum.UserInputState.Begin then
+            if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+                RightMouseButtonDown = true
+                LastRightButtonDown = Vector2.new(Mouse.X, Mouse.Y)
+                UIS.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
+            elseif Input.KeyCode == Enum.KeyCode.Z then
+                TargetFOV = 20
+            elseif Input.KeyCode == SprintKey then
+                Sprinting = true
+            end
+        else
+            if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+                RightMouseButtonDown = false
+                UIS.MouseBehavior = Enum.MouseBehavior.Default
+            elseif Input.KeyCode == Enum.KeyCode.Z then
+                TargetFOV = 70
+            elseif Input.KeyCode == SprintKey then
+                Sprinting = false
+            end
+        end
+    end
+end
+
 Instance.new("ScreenGui", game.CoreGui).Name = "Kaoru"
 local ChamsFolder = Instance.new("Folder")
 ChamsFolder.Name = "ChamsFolder"
@@ -967,11 +1046,11 @@ ConfigTab:CreateButton({
     end;
 })
 
-local GroupTab = Window:CreateTab("Group Tools");
-GroupTab:CreateSection('Admin Detecter')
+local MiscTab = Window:CreateTab("Misc");
+MiscTab:CreateSection('Misc')
 
 local AdminDetecterToggle = false;
-GroupTab:CreateToggle({
+MiscTab:CreateToggle({
     Name = "Admin Detecter (Not 100% Accurate)";
     CurrentValue = false;
     Callback = function(AdminDetecterValue)
@@ -987,6 +1066,66 @@ GroupTab:CreateToggle({
         end
     end;
 })
+
+MiscTab:CreateToggle({
+    Name = "Free Camera";
+    CurrentValue = false;
+    Callback = function(FreeCameraValue)
+        FreeCameraToggle = FreeCameraValue
+    end;
+})
+
+local SprintKeyInput = MiscTab:CreateInput({
+    Name = "Free Camera | Sprint Key";
+    PlaceholderText = "Current Key: " .. SprintKey.Name;
+    RemoveTextAfterFocusLost = false;
+    Callback = function(Text)
+        SprintKey = Enum.KeyCode[Text]
+    end,
+})
+
+UIS.InputChanged:Connect(function(InputObject)
+    if InputObject.UserInputType == Enum.UserInputType.MouseMovement then
+        MovePosition = MovePosition + Vector2.new(InputObject.Delta.X, InputObject.Delta.Y)
+    end
+end)
+
+Mouse.WheelForward:Connect(function()
+    Camera.CoordinateFrame = Camera.CoordinateFrame * CFrame.new(0, 0, -5)
+end)
+
+Mouse.WheelBackward:Connect(function()
+    Camera.CoordinateFrame = Camera.CoordinateFrame * CFrame.new(0, 0, 5)
+end)
+
+UIS.InputBegan:Connect(Input)
+UIS.InputEnded:Connect(Input)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    --SprintKeyInput.PlaceholderText = "Current Key: " .. SprintKey.Name;
+    if FreeCameraToggle then
+        Camera.CameraType = Enum.CameraType.Scriptable
+        HumanoidRootPart.Anchored = true
+        Humanoid.PlatformStand = true
+
+        TargetMovePosition = MovePosition
+        Camera.CoordinateFrame = CFrame.new(Camera.CoordinateFrame.Position) *
+        CFrame.fromEulerAnglesYXZ(-TargetMovePosition.Y/Y_Sensitivity ,-TargetMovePosition.X/X_Sensitivity, 0) *
+        CFrame.new(CalculateMovement() * ((({[true] = SprintingSpeed})[Sprinting]) or 0.5))
+
+        Camera.FieldOfView = Tween(Camera.FieldOfView, TargetFOV, 0.5)
+        if RightMouseButtonDown then
+            UIS.MouseBehavior = Enum.MouseBehavior.LockCurrentPosition
+            MovePosition = MovePosition - (LastRightButtonDown - Vector2.new(Mouse.X,Mouse.Y))
+            LastRightButtonDown = Vector2.new(Mouse.X,Mouse.Y)
+        end
+    else
+        Humanoid.PlatformStand = false
+        HumanoidRootPart.Anchored = false
+        Camera.CameraSubject = Humanoid
+        Camera.CameraType = "Custom"
+    end
+end)
 
 Players.PlayerAdded:Connect(function(Player)
     if AdminDetecterToggle then
