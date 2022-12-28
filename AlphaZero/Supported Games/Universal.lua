@@ -24,16 +24,12 @@ local SprintKey = Enum.KeyCode.LeftShift;
 local MovePosition = Vector2.new(0, 0)
 local TargetMovePosition = MovePosition
 
-local Y_Sensitivity = 300;
-local X_Sensitivity = 300;
-
 local LastRightButtonDown = Vector2.new(0, 0)
 local RightMouseButtonDown = false
 
 local TargetFOV = 70
 
 local Sprinting = false;
-local SprintingSpeed = 3;
 
 local KeysDown = {};
 local KeyMappings = {
@@ -100,34 +96,6 @@ local function IsAdmin(Player)
     end
 
     return false;
-end
-
-local function ServerHop()
-    local Servers = {};
-    local Response = Request({Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", PlaceId)});
-    local Body = HttpService:JSONDecode(Response.Body);
-
-    if Body and Body.data then
-        for _, Server in next, Body.data do
-            if type(Server) == "table" and tonumber(Server.playing) and tonumber(Server.maxPlayers) and Server.playing < Server.maxPlayers and Server.id ~= JobId then
-                table.insert(Servers, 1, Server.id);
-            end
-        end
-    end
-
-    if #Servers > 0 then
-        TeleportService:TeleportToPlaceInstance(PlaceId, Servers[math.random(1, #Servers)], LocalPlayer);
-        Utils.Network:QueueOnTeleport([[
-            repeat task.wait() until game:IsLoaded()
-
-            local Network = loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/CustomFuncs/Network.lua")))();
-            Network:Notify("Server Hop", "Successfully Hopped To New Server", 5);
-
-            loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Universal.lua")))()
-        ]])
-    else
-        Utils.Network:Notify("Server Hop", "No servers found to hop to", 10);
-    end
 end
 
 local function GetCorners(Part)
@@ -1060,7 +1028,7 @@ MiscTab:CreateToggle({
             for _, Player in next, Players:GetPlayers() do
                 if IsAdmin(Player) then
                     LocalPlayer:Kick(string.format("Admin Detected (%s), Server Hopping...", Player.Name));
-                    ServerHop();
+                    Utils.Network:ServerHop();
                 end
             end
         end
@@ -1110,8 +1078,8 @@ game:GetService("RunService").RenderStepped:Connect(function()
 
         TargetMovePosition = MovePosition
         Camera.CoordinateFrame = CFrame.new(Camera.CoordinateFrame.Position) *
-        CFrame.fromEulerAnglesYXZ(-TargetMovePosition.Y/Y_Sensitivity ,-TargetMovePosition.X/X_Sensitivity, 0) *
-        CFrame.new(CalculateMovement() * ((({[true] = SprintingSpeed})[Sprinting]) or 0.5))
+        CFrame.fromEulerAnglesYXZ(-TargetMovePosition.Y / 300, -TargetMovePosition.X / 300, 0) *
+        CFrame.new(CalculateMovement() * ((({[true] = 3})[Sprinting]) or 0.5))
 
         Camera.FieldOfView = Tween(Camera.FieldOfView, TargetFOV, 0.5)
         if RightMouseButtonDown then
@@ -1131,10 +1099,56 @@ Players.PlayerAdded:Connect(function(Player)
     if AdminDetecterToggle then
         if IsAdmin(Player) then
             LocalPlayer:Kick(string.format("Admin Detected (%s), Server Hopping...", Player.Name));
-            ServerHop();
+            Utils.Network:ServerHop();
         end
     end
 end)
+
+local function DoName(Player)
+    if IsAlive(Player) and Player.Character:FindFirstChildOfClass('Humanoid').DisplayName ~= Player.Name then
+        if not Player.Character:FindFirstChildOfClass('Humanoid').DisplayName:find(Player.Name) then
+            local PlayersHumanoid = Player.Character:FindFirstChildOfClass('Humanoid')
+            PlayersHumanoid.DisplayName = Player.DisplayName..'\n['..Player.Name..']'
+        end
+    end
+end
+
+local function FixName()
+    for _, Player in next, Players:GetPlayers() do
+        if Player ~= LocalPlayer then
+            DoName(Player)
+        end
+    end
+end
+
+MiscTab:CreateButton({
+    Name = "Show Real Name";
+    Callback = function()
+        FixName()
+
+        Players.PlayerAdded:Connect(function(Player)
+            if Player ~= LocalPlayer then
+                DoName(Player)
+            end
+        end)
+    end;
+})
+
+MiscTab:CreateSection('Teleports')
+
+MiscTab:CreateButton({
+    Name = "Rejoin Server";
+    Callback = function()
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+    end;
+})
+
+MiscTab:CreateButton({
+    Name = "Join New Server";
+    Callback = function()
+        Utils.Network:ServerHop();
+    end;
+})
 
 local CreditsTab = Window:CreateTab("Credits");
 CreditsTab:CreateSection('Credits')
