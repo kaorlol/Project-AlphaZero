@@ -995,7 +995,7 @@ ConfigTab:CreateButton({
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("HumanoidRootPart");
-            AimbotSmoothness:Set(0.25)
+            AimbotSmoothness:Set(0.15)
         elseif SelectedConfig == "Legit" then
             AimbotTabToggle:Set(true);
             TriggerbotTabToggle:Set(false);
