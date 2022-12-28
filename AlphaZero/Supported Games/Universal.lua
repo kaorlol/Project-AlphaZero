@@ -16,6 +16,7 @@ local Tracers = false;
 local TeamCheck = false;
 local FOV = false;
 local FOVSize, FOVFollowMouse = 100, false;
+local CornerESP = false;
 
 local MarketplaceService = game:GetService("MarketplaceService");
 local GameName = MarketplaceService:GetProductInfo(game.PlaceId).Name;
@@ -61,7 +62,7 @@ local function IsAdmin(Player)
     if UserId == CreatorId then
         return true;
     elseif GroupId ~= nil then
-        local InGroup = Player:IsInGroup(CreatorId);
+        local InGroup = Player:IsInGroup(GroupId);
         local GroupRank = Player:GetRankInGroup(GroupId);
         local WorstRank = GetWorstRank();
 
@@ -486,6 +487,114 @@ local function DrawFOV()
     coroutine.wrap(UpdateFOV)();
 end
 
+-- This will make my life easier
+local function NewLine(Color, Thickness)
+    local Line = Drawing.new("Line");
+    Line.Visible = false;
+    Line.From = Vector2.new(0, 0);
+    Line.To = Vector2.new(0, 0);
+    Line.Color = Color;
+    Line.Thickness = Thickness;
+    return Line;
+end
+
+local EspFaceCamera  = true;
+local function DrawCornerESP(Player)
+    local Lines = {
+        TopLeft1 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+        TopLeft2 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+
+        TopRight1 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+        TopRight2 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+
+        BottomLeft1 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+        BottomLeft2 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+
+        BottomRight1 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+        BottomRight2 = NewLine(Color3.fromRGB(255, 255, 255), 1);
+    };
+
+    local OrigenPart = Instance.new("Part")
+    OrigenPart.Parent = workspace
+    OrigenPart.Transparency = 1
+    OrigenPart.CanCollide = false
+    OrigenPart.Size = Vector3.new(1, 1, 1)
+    OrigenPart.Position = Vector3.new(0, 0, 0)
+
+    local function UpdateCornerESP()
+        task.spawn(function()
+            while true do task.wait()
+                -- Check if corner esp is enabled
+                if not CornerESP then
+                    for _, Line in next, Lines do
+                        Line.Visible = false;
+                    end
+                    break;
+                end
+
+                -- Check if rainbow esp is enabled
+                if RainbowESP then
+                    ESPColor = Color3.fromHSV(tick() % 5 / 5, 1, 1);
+                else
+                    ESPColor = OldEspColor;
+                end
+
+                -- Check if the player is valid
+                if Player and Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+                    -- Check if the player is on the same team
+                    if IsSameTeam(Player, TeamCheck) and IsOnScreen(Player.Character.HumanoidRootPart) and IsAlive(Player) then
+                        OrigenPart.Size = Vector3.new(Player.Character.HumanoidRootPart.Size.X, Player.Character.HumanoidRootPart.Size.Y * 1.5, Player.Character.HumanoidRootPart.Size.Z)
+                        OrigenPart.CFrame = CFrame.new(Player.Character.HumanoidRootPart.CFrame.Position, Camera.CFrame.Position)
+                        local SizeX = OrigenPart.Size.X
+                        local SizeY = OrigenPart.Size.Y
+                        local TopLeft = Camera:WorldToViewportPoint((OrigenPart.CFrame * CFrame.new(SizeX, SizeY, 0)).Position)
+                        local TopRight = Camera:WorldToViewportPoint((OrigenPart.CFrame * CFrame.new(-SizeX, SizeY, 0)).Position)
+                        local BottomLeft = Camera:WorldToViewportPoint((OrigenPart.CFrame * CFrame.new(SizeX, -SizeY, 0)).Position)
+                        local BottomRight = Camera:WorldToViewportPoint((OrigenPart.CFrame * CFrame.new(-SizeX, -SizeY, 0)).Position)
+
+                        local Ratio = (Camera.CFrame.Position - Player.Character.HumanoidRootPart.Position).Magnitude;
+                        local Offset = math.clamp(1 / Ratio * 750, 2, 300);
+
+                        Lines.TopLeft1.From = Vector2.new(TopLeft.X, TopLeft.Y)
+                        Lines.TopLeft1.To = Vector2.new(TopLeft.X + Offset, TopLeft.Y)
+                        Lines.TopLeft2.From = Vector2.new(TopLeft.X, TopLeft.Y)
+                        Lines.TopLeft2.To = Vector2.new(TopLeft.X, TopLeft.Y + Offset)
+
+                        Lines.TopRight1.From = Vector2.new(TopRight.X, TopRight.Y)
+                        Lines.TopRight1.To = Vector2.new(TopRight.X - Offset, TopRight.Y)
+                        Lines.TopRight2.From = Vector2.new(TopRight.X, TopRight.Y)
+                        Lines.TopRight2.To = Vector2.new(TopRight.X, TopRight.Y + Offset)
+
+                        Lines.BottomLeft1.From = Vector2.new(BottomLeft.X, BottomLeft.Y)
+                        Lines.BottomLeft1.To = Vector2.new(BottomLeft.X + Offset, BottomLeft.Y)
+                        Lines.BottomLeft2.From = Vector2.new(BottomLeft.X, BottomLeft.Y)
+                        Lines.BottomLeft2.To = Vector2.new(BottomLeft.X, BottomLeft.Y - Offset)
+
+                        Lines.BottomRight1.From = Vector2.new(BottomRight.X, BottomRight.Y)
+                        Lines.BottomRight1.To = Vector2.new(BottomRight.X - Offset, BottomRight.Y)
+                        Lines.BottomRight2.From = Vector2.new(BottomRight.X, BottomRight.Y)
+                        Lines.BottomRight2.To = Vector2.new(BottomRight.X, BottomRight.Y - Offset)
+
+                        for _, Line in next, Lines do
+                            Line.Color = ESPColor;
+                            Line.Visible = true;
+                        end
+                    else
+                        for _, Line in next, Lines do
+                            Line.Visible = false;
+                        end
+                    end
+                else
+                    for _, Line in next, Lines do
+                        Line.Visible = false;
+                    end
+                end
+            end
+        end)
+    end
+    coroutine.wrap(UpdateCornerESP)();
+end
+
 local function AimAt(Player, TargetPart, Smoothness)
     Player = Player or error("No player provided");
     TargetPart = TargetPart or "Head";
@@ -715,6 +824,20 @@ local TracersToggle = VisualsTab:CreateToggle({
     end;
 })
 
+local CornerEspToggle = VisualsTab:CreateToggle({
+    Name = "Corner ESP";
+    CurrentValue = false;
+    Callback = function(AngleEspValue)
+        CornerESP = AngleEspValue;
+
+        if CornerESP then
+            for _, Player in next, Players:GetPlayers() do
+                DrawCornerESP(Player);
+            end
+        end
+    end;
+})
+
 VisualsTab:CreateSection("FOV & FOV Settings");
 
 local FOVToggle = VisualsTab:CreateToggle({
@@ -759,6 +882,10 @@ Players.PlayerAdded:Connect(function(Player)
 
     if Nametags then
         DrawNametag(Player);
+    end
+
+    if CornerESP then
+        DrawCornerESP(Player);
     end
 end)
 
@@ -827,7 +954,7 @@ ConfigTab:CreateButton({
             TriggerbotTabToggle:Set(false);
             RainbowEspToggle:Set(true);
             FOVToggle:Set(true);
-            FOVSizeSlider:Set(100);
+            FOVSizeSlider:Set(175);
             ChamsTabToggle:Set(true);
             TracersToggle:Set(true);
             NametagsToggle:Set(true);
