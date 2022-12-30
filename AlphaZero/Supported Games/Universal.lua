@@ -677,6 +677,11 @@ local Window = Rayfield:CreateWindow({
     Name = string.format("Project: AlphaZero | Universal Remake"),
     LoadingTitle = string.format("Project: AlphaZero | Universal Remake"),
     LoadingSubtitle = "By: Kaoru~#6438 and Sw1ndler#7733",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "AlphaZero",
+        FileName = "Saved Configuration"
+     },
     Discord = {
         Enabled = true,
         Invite = "JdzPVMNFwY",
@@ -693,6 +698,7 @@ local TargetPart = "Head";
 AimbotTab:CreateDropdown({
     Name = "Aimbot Method";
     Options = {"Closest To Crosshair", "Closest To Player"};
+    Save = true;
     CurrentOption = "Closest To Crosshair";
     Callback = function(Method)
         if Method == "Closest To Crosshair" then
@@ -714,6 +720,7 @@ AimbotTab:CreateDropdown({
 local AimbotToggle = false;
 local AimbotTabToggle = AimbotTab:CreateToggle({
     Name = "Aimbot";
+    Save = true;
     CurrentValue = false;
     Callback = function(AimbotValue)
         AimbotToggle = AimbotValue;
@@ -732,6 +739,7 @@ local AimbotTabToggle = AimbotTab:CreateToggle({
 local TriggerbotToggle = false;
 local TriggerbotTabToggle = AimbotTab:CreateToggle({
     Name = "Triggerbot";
+    Save = true;
     CurrentValue = false;
     Callback = function(TriggerbotValue)
         TriggerbotToggle = TriggerbotValue;
@@ -748,6 +756,7 @@ AimbotTab:CreateSection("Aimbot Settings");
 
 AimbotTab:CreateToggle({
     Name = "Team Check";
+    Save = true;
     CurrentValue = false;
     Callback = function(TeamCheckValue)
         TeamCheck = TeamCheckValue;
@@ -757,6 +766,7 @@ AimbotTab:CreateToggle({
 local TargetPartDropdown = AimbotTab:CreateDropdown({
     Name = "Target Part";
     Options = {"Head", "HumanoidRootPart", "Get Closest Part From Mouse"};
+    Save = true;
     CurrentOption = "Head";
     Callback = function(TargetPartValue)
         TargetPart = TargetPartValue;
@@ -768,6 +778,7 @@ local AimbotSmoothness = AimbotTab:CreateSlider({
     Range = {0, 1};
     Increment = 0.001;
     Suffix = "";
+    Save = true;
     CurrentValue = 0.25;
     Callback = function(SmoothnessValue)
         Smoothness = SmoothnessValue;
@@ -780,6 +791,7 @@ VisualsTab:CreateSection("Visuals Toggles");
 local ChamsToggle, OldChamsColor = false, Color3.fromRGB(255, 255, 255);
 local ChamsTabToggle = VisualsTab:CreateToggle({
     Name = "Chams";
+    Save = true;
     CurrentValue = false;
     Callback = function(ChamsValue)
         ChamsToggle = ChamsValue;
@@ -831,6 +843,7 @@ local ChamsTabToggle = VisualsTab:CreateToggle({
 
 local ESPTabToggle = VisualsTab:CreateToggle({
     Name = "ESP";
+    Save = true;
     CurrentValue = false;
     Callback = function(ESPValue)
         ESPToggle = ESPValue;
@@ -845,6 +858,7 @@ local ESPTabToggle = VisualsTab:CreateToggle({
 
 local NametagsToggle = VisualsTab:CreateToggle({
     Name = "Nametags";
+    Save = true;
     CurrentValue = false;
     Callback = function(NametagsValue)
         Nametags = NametagsValue;
@@ -859,6 +873,7 @@ local NametagsToggle = VisualsTab:CreateToggle({
 
 local TracersToggle = VisualsTab:CreateToggle({
     Name = "Tracers";
+    Save = true;
     CurrentValue = false;
     Callback = function(TracersValue)
         Tracers = TracersValue;
@@ -873,6 +888,7 @@ local TracersToggle = VisualsTab:CreateToggle({
 
 local CornerEspToggle = VisualsTab:CreateToggle({
     Name = "Corner ESP";
+    Save = true;
     CurrentValue = false;
     Callback = function(AngleEspValue)
         CornerESP = AngleEspValue;
@@ -889,6 +905,7 @@ VisualsTab:CreateSection("FOV & FOV Settings");
 
 local FOVToggle = VisualsTab:CreateToggle({
     Name = "Use FOV";
+    Save = true;
     CurrentValue = false;
     Callback = function(FOVValue)
         FOV = FOVValue;
@@ -901,6 +918,7 @@ local FOVToggle = VisualsTab:CreateToggle({
 
 VisualsTab:CreateToggle({
     Name = "FOV Follow Mouse";
+    Save = true;
     CurrentValue = false;
     Callback = function(FOVFollowMouseValue)
         FOVFollowMouse = FOVFollowMouseValue;
@@ -912,6 +930,7 @@ local FOVSizeSlider = VisualsTab:CreateSlider({
     Range = {0, 1000};
     Increment = 1;
     Suffix = "";
+    Save = true;
     CurrentValue = 100;
     Callback = function(FOVSizeValue)
         FOVSize = FOVSizeValue;
@@ -940,6 +959,7 @@ VisualsTab:CreateSection("Visuals Settings");
 
 local RainbowEspToggle = VisualsTab:CreateToggle({
     Name = "Rainbow ESP";
+    Save = true;
     CurrentValue = false;
     Callback = function(RainbowESPValue)
         RainbowESP, RainbowChams = RainbowESPValue, RainbowESPValue;
@@ -948,6 +968,7 @@ local RainbowEspToggle = VisualsTab:CreateToggle({
 
 VisualsTab:CreateColorPicker({
     Name = "ESP Color";
+    Save = true;
     Color = Color3.fromRGB(255, 255, 255);
     Callback = function(ESPColorValue)
         ESPColor, OldEspColor = ESPColorValue, ESPColorValue;
@@ -962,6 +983,7 @@ local SelectedConfig = "None";
 ConfigTab:CreateDropdown({
     Name = "Config";
     Options = {"Rage", "Semi-Legit", "Legit"};
+    Save = true;
     CurrentOption = "None";
     Callback = function(ConfigValue)
         SelectedConfig = ConfigValue;
@@ -970,6 +992,7 @@ ConfigTab:CreateDropdown({
 
 ConfigTab:CreateButton({
     Name = "Apply Config";
+    Save = true;
     CurrentValue = false;
     Callback = function()
         if SelectedConfig == "Rage" then
@@ -1008,7 +1031,7 @@ ConfigTab:CreateButton({
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("Get Closest Part From Mouse");
             AimbotSmoothness:Set(0.1)
-        elseif SelectedConfig == "None" then
+        elseif SelectedConfig == nil or SelectedConfig == "None" then
             return Utils.Network:Notify("Error", "Please select a valid config!", 5)
         end
     end;
@@ -1020,6 +1043,7 @@ MiscTab:CreateSection('Misc')
 local AdminDetecterToggle = false;
 MiscTab:CreateToggle({
     Name = "Admin Detecter (Not 100% Accurate)";
+    Save = true;
     CurrentValue = false;
     Callback = function(AdminDetecterValue)
         AdminDetecterToggle = AdminDetecterValue;
@@ -1037,6 +1061,7 @@ MiscTab:CreateToggle({
 
 MiscTab:CreateToggle({
     Name = "Free Camera";
+    Save = true;
     CurrentValue = false;
     Callback = function(FreeCameraValue)
         FreeCameraToggle = FreeCameraValue
@@ -1173,3 +1198,5 @@ Utils.Network:QueueOnTeleport([[
 
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Universal.lua")))()
 ]])
+
+Rayfield:LoadConfiguration()
