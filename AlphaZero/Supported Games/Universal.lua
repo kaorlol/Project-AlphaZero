@@ -1061,7 +1061,6 @@ ConfigTab:CreateButton({
             RainbowEspToggle:Set(true);
             FOVToggle:Set(true);
             FOVSizeSlider:Set(1000);
-            ChamsTabToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("Head");
@@ -1072,7 +1071,6 @@ ConfigTab:CreateButton({
             RainbowEspToggle:Set(true);
             FOVToggle:Set(true);
             FOVSizeSlider:Set(250);
-            ChamsTabToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("HumanoidRootPart");
@@ -1083,7 +1081,6 @@ ConfigTab:CreateButton({
             RainbowEspToggle:Set(true);
             FOVToggle:Set(true);
             FOVSizeSlider:Set(175);
-            ChamsTabToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("Get Closest Part From Mouse");
