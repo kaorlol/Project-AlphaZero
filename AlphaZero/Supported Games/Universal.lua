@@ -19,6 +19,7 @@ local FOV = false;
 local FOVSize, FOVFollowMouse = 100, false;
 local CornerESP = false;
 local FreeCameraToggle = false;
+local VisableEsp = false;
 
 local SprintKey = Enum.KeyCode.LeftShift;
 local MovePosition = Vector2.new(0, 0)
@@ -62,9 +63,23 @@ local HttpService = game:GetService("HttpService");
 local Request = (syn and syn.request) or (http and http.request) or http_request;
 
 local GroupId = nil;
-if Players:GetPlayerByUserId(CreatorId) == nil then
+local Success, Error = pcall(function()
     local Group = GroupService:GetGroupInfoAsync(CreatorId);
     GroupId = Group.Id;
+end)
+
+if not Success then
+    warn(string.format("Failed to get group id: %s", Error));
+    task.wait(5);
+    local Retry, RetryError = pcall(function()
+        local Group = GroupService:GetGroupInfoAsync(CreatorId);
+        GroupId = Group.Id;
+    end)
+
+    if not Retry then
+        warn(string.format("Failed to get group id: %s", RetryError));
+        Utils.Network:Notif("Error", "Failed to get group id, try rejoining the game.", 5);
+    end
 end
 
 local function GetWorstRank()
@@ -281,6 +296,8 @@ local function DrawNametag(Player)
     Nametag.Color = Color3.fromRGB(255, 255, 255);
     Nametag.Outline = true;
 
+    local PlayerIsVisible = false;
+
     local function UpdateNametag()
         -- Create a new task that will update the player's nametag every frame.
         task.spawn(function()
@@ -292,11 +309,10 @@ local function DrawNametag(Player)
                 end
 
                 -- If rainbow nametags are enabled, set the nametag's color to a rainbow color.
-                if RainbowESP then
-                    Nametag.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1);
+                if RainbowESP and not PlayerIsVisible then
+                    ESPColor = Color3.fromHSV(tick() % 5 / 5, 1, 1);
                 else
-                    -- Otherwise, set the nametag's color to white.
-                    Nametag.Color = Color3.fromRGB(255, 255, 255);
+                    ESPColor = OldEspColor;
                 end
 
                 -- Check if the player exists, is not the local player, has a character, and if the character has a HumanoidRootPart and a Head.
@@ -314,6 +330,13 @@ local function DrawNametag(Player)
                         Nametag.Visible = true
                         Nametag.Position = Vector2.new(HeadPosition.X - (Nametag.TextBounds.X / 2), HeadPosition.Y - (Nametag.TextBounds.Y * 1.25));
                         Nametag.Color = ESPColor
+
+                        if IsVisible(Player) and VisableEsp then
+                            ESPColor = Color3.fromRGB(255, 255, 255);
+                            PlayerIsVisible = true;
+                        else
+                            PlayerIsVisible = false;
+                        end
                     else
                         Nametag.Visible = false;
                     end
@@ -338,6 +361,8 @@ local function DrawESP(Player)
     Box.Thickness = 1;
     Box.Filled = false;
 
+    local PlayerIsVisible = false;
+
     local function UpdateESP()
         task.spawn(function()
             while true do task.wait()
@@ -348,7 +373,7 @@ local function DrawESP(Player)
                 end
 
                 -- Check if rainbow esp is toggled on
-                if RainbowESP then
+                if RainbowESP and not PlayerIsVisible then
                     ESPColor = Color3.fromHSV(tick() % 5 / 5, 1, 1);
                 else
                     ESPColor = OldEspColor;
@@ -376,6 +401,13 @@ local function DrawESP(Player)
                         Box.PointC = Vector2.new(Vectors[3].X, Vectors[3].Y);
                         Box.PointD = Vector2.new(Vectors[4].X, Vectors[4].Y);
                         Box.Color = ESPColor;
+
+                        if IsVisible(Player) and VisableEsp then
+                            ESPColor = Color3.fromRGB(255, 255, 255);
+                            PlayerIsVisible = true;
+                        else
+                            PlayerIsVisible = false;
+                        end
                     else
                         Box.Visible = false;
                     end
@@ -494,7 +526,7 @@ local function NewLine(Color, Thickness)
     return Line;
 end
 
-local EspFaceCamera  = true;
+local EspFaceCamera = true;
 local function DrawCornerESP(Player)
     local Lines = {
         TopLeft1 = NewLine(Color3.fromRGB(255, 255, 255), 1);
@@ -517,6 +549,8 @@ local function DrawCornerESP(Player)
     OrigenPart.Size = Vector3.new(1, 1, 1)
     OrigenPart.Position = Vector3.new(0, 0, 0)
 
+    local PlayerIsVisible = false;
+
     local function UpdateCornerESP()
         task.spawn(function()
             while true do task.wait()
@@ -529,7 +563,7 @@ local function DrawCornerESP(Player)
                 end
 
                 -- Check if rainbow esp is enabled
-                if RainbowESP then
+                if RainbowESP and not PlayerIsVisible then
                     ESPColor = Color3.fromHSV(tick() % 5 / 5, 1, 1);
                 else
                     ESPColor = OldEspColor;
@@ -570,6 +604,13 @@ local function DrawCornerESP(Player)
                         Lines.BottomRight1.To = Vector2.new(BottomRight.X - Offset, BottomRight.Y)
                         Lines.BottomRight2.From = Vector2.new(BottomRight.X, BottomRight.Y)
                         Lines.BottomRight2.To = Vector2.new(BottomRight.X, BottomRight.Y - Offset)
+
+                        if IsVisible(Player) and VisableEsp then
+                            ESPColor = Color3.fromRGB(255, 255, 255);
+                            PlayerIsVisible = true;
+                        else
+                            PlayerIsVisible = false;
+                        end
 
                         for _, Line in next, Lines do
                             Line.Color = ESPColor;
@@ -679,14 +720,14 @@ local Window = Rayfield:CreateWindow({
     LoadingSubtitle = "By: Kaoru~#6438 and Sw1ndler#7733",
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "AlphaZero",
+        FolderName = "AlphaZero/Universal",
         FileName = "Saved Configuration"
-     },
+    },
     Discord = {
         Enabled = true,
         Invite = "JdzPVMNFwY",
         RememberJoins = true,
-     },
+    },
 })
 
 local AimbotTab = Window:CreateTab("Aimbot");
@@ -789,6 +830,8 @@ local VisualsTab = Window:CreateTab("Visuals");
 VisualsTab:CreateSection("Visuals Toggles");
 
 local ChamsToggle, OldChamsColor = false, Color3.fromRGB(255, 255, 255);
+local Chams = nil;
+
 local ChamsTabToggle = VisualsTab:CreateToggle({
     Name = "Chams";
     Save = true;
@@ -797,8 +840,9 @@ local ChamsTabToggle = VisualsTab:CreateToggle({
         ChamsToggle = ChamsValue;
 
         task.spawn(function()
+            local PlayerIsVisible = false;
             while ChamsToggle do task.wait()
-                if RainbowChams then
+                if RainbowChams and not PlayerIsVisible then
                     ChamsColor = Color3.fromHSV(tick() % 5 / 5, 1, 1);
                 else
                     ChamsColor = OldChamsColor;
@@ -823,6 +867,13 @@ local ChamsTabToggle = VisualsTab:CreateToggle({
                         Chams.OutlineTransparency = 0;
                         Chams.DepthMode = Enum.HighlightDepthMode[(true and "AlwaysOnTop" or "Occluded")];
                         Chams.FillTransparency = 1;
+
+                        if IsVisible(Player) and VisableEsp then
+                            ChamsColor = Color3.fromRGB(255, 255, 255);
+                            PlayerIsVisible = true;
+                        else
+                            PlayerIsVisible = false;
+                        end
                     end
                 end
 
@@ -957,6 +1008,15 @@ end)
 
 VisualsTab:CreateSection("Visuals Settings");
 
+VisualsTab:CreateToggle({
+    Name = "Make ESP white when visable";
+    Save = true;
+    CurrentValue = false;
+    Callback = function(VisableEspValue)
+        VisableEsp = VisableEspValue;
+    end;
+})
+
 local RainbowEspToggle = VisualsTab:CreateToggle({
     Name = "Rainbow ESP";
     Save = true;
@@ -1002,7 +1062,6 @@ ConfigTab:CreateButton({
             FOVToggle:Set(true);
             FOVSizeSlider:Set(1000);
             ChamsTabToggle:Set(true);
-            TracersToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("Head");
@@ -1014,7 +1073,6 @@ ConfigTab:CreateButton({
             FOVToggle:Set(true);
             FOVSizeSlider:Set(250);
             ChamsTabToggle:Set(true);
-            TracersToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("HumanoidRootPart");
@@ -1026,7 +1084,6 @@ ConfigTab:CreateButton({
             FOVToggle:Set(true);
             FOVSizeSlider:Set(175);
             ChamsTabToggle:Set(true);
-            TracersToggle:Set(true);
             NametagsToggle:Set(true);
             ESPTabToggle:Set(true);
             TargetPartDropdown:Set("Get Closest Part From Mouse");
