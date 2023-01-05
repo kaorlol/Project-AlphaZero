@@ -56,6 +56,10 @@ local EntityLib = {}; do
 
         return self:GetEnemyColor(Ent.Targetable)
     end
+
+    function EntityLib:TeleportTo(Position)
+        Entity.character.HumanoidRootPart.CFrame = CFrame.new(Position)
+    end
 end
 
 Entity = EntityLib:Run(EntityLib:Require("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/Libraries/entityHandler.lua", true, true))
