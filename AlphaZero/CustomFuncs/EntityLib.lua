@@ -3,6 +3,7 @@ local Entity = nil;
 local PathfindingService = game:GetService("PathfindingService");
 local TweenService = game:GetService("TweenService");
 local Camera = workspace.CurrentCamera;
+local Lines = {}
 
 local function WorldToPoint(Position)
     local Vector,_ = Camera:WorldToViewportPoint(Position);
@@ -68,7 +69,11 @@ local EntityLib = {}; do
         return Color3.new(0.470588, 1, 0.470588);
     end;
 
-    function EntityLib:GetColorFromEntity(Ent, UseTeamColor, Custom, Rainbow, Color)
+    function EntityLib:GetColorFromEntity(Ent, Health, UseTeamColor, Custom, Rainbow, Color)
+        if Health then
+            return Color3.fromHSV(Ent.Humanoid.Health / Ent.Humanoid.MaxHealth, 1, 1);
+        end
+
         if Ent.Team and Ent.Team.TeamColor.Color and UseTeamColor then
             return Ent.Team.TeamColor.Color
         end
@@ -112,6 +117,13 @@ local EntityLib = {}; do
                 end
             end
         end
+
+        if Path.Status == Enum.PathStatus.Success then
+            for _, Line in next, Lines do
+                Line.Line:Destroy();
+            end
+            table.clear(Lines);
+        end
     end;
 
     function EntityLib:TweenTo(Position, Time)
@@ -133,18 +145,15 @@ local EntityLib = {}; do
         end)
     end
 
-    function EntityLib:DrawPath(Position, Color, Toggle)
+    function EntityLib:DrawPath(Position, Toggle)
         local LoopToggle = Toggle;
         if Toggle then
-            local LastUpdate = tick();
             local Path = PathfindingService:FindPathAsync(Entity.character.HumanoidRootPart.Position, Position);
             local Waypoints = Path:GetWaypoints();
 
             if #Waypoints == 0 then
                 return;
             end
-
-            local Lines = {}
 
             for Waypoint = 1, #Waypoints do
                 local Line = Drawing.new("Line");
@@ -162,7 +171,7 @@ local EntityLib = {}; do
 
                 Line.To = WorldToPoint(LineTo);
 
-                Line.Color = Color
+                Line.Color = Color3.new(1, 1, 1);
                 Line.Thickness = 2;
                 Line.Transparency = 1;
 
@@ -177,7 +186,6 @@ local EntityLib = {}; do
                 while LoopToggle do task.wait()
                     for _, Line in next, Lines do
                         local _, OnScreen = Camera:WorldToViewportPoint(Line.From);
-                        local Distance = (Entity.character.HumanoidRootPart.Position - Position).Magnitude;
 
                         if OnScreen then
                             Line.Line.Visible = true;
@@ -185,25 +193,9 @@ local EntityLib = {}; do
                             Line.Line.Visible = false;
                         end
 
-                        if Distance <= 5 then
-                            for _, Line in next, Lines do
-                                Line.Line:Destroy();
-                            end
-                            table.clear(Lines);
-                        end
-
-                        if #Lines > 0 then
-                            if tick() - LastUpdate >= 60 then
-                                for _, Line in next, Lines do
-                                    Line.Line:Destroy();
-                                end
-                                table.clear(Lines);
-                            end
-                        end
-
                         Line.Line.From = WorldToPoint(Line.From);
                         Line.Line.To = WorldToPoint(Line.To);
-                        Line.Line.Color = Color;
+                        Line.Line.Color = Color3.new(1, 1, 1);;
                     end
                 end
             end)
