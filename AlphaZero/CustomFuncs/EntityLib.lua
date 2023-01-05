@@ -2,6 +2,13 @@ local Request = (syn and syn.request) or request or http_Request or (http and ht
 local Entity = nil;
 local PathfindingService = game:GetService("PathfindingService");
 local TweenService = game:GetService("TweenService");
+local Camera = workspace.CurrentCamera;
+
+local function WorldToPoint(Position)
+    local Vector,_ = Camera:WorldToViewportPoint(Position);
+    local NewVector = Vector2.new(Vector.X, Vector.Y);
+    return NewVector;
+end
 
 local EntityLib = {}; do
     function EntityLib:Require(Url)
@@ -13,7 +20,7 @@ local EntityLib = {}; do
         if Response.StatusCode == 200 then
             return Response.Body;
         end
-    end
+    end;
 
     function EntityLib:Run(Code)
         local Function, Error = loadstring(Code)
@@ -23,7 +30,7 @@ local EntityLib = {}; do
         end
 
         return Function()
-    end
+    end;
 
     function EntityLib:GetPlayerNames()
         local PlayerNames = {};
@@ -33,15 +40,15 @@ local EntityLib = {}; do
         end
 
         return PlayerNames;
-    end
+    end;
 
     function EntityLib:IsAlive(Thing, StateCheck)
-        if StateCheck ~= false and not StateCheck then
-            StateCheck = true;
-        end
-
         if not Thing then
             return Entity.isAlive;
+        end
+
+        if StateCheck ~= false and not StateCheck then
+            StateCheck = true;
         end
 
         if table.find(self:GetPlayerNames(), Thing.Name) then
@@ -51,7 +58,7 @@ local EntityLib = {}; do
         else
             return ((not StateCheck) or Thing and Thing.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead) and Thing;
         end
-    end
+    end;
 
     function EntityLib:GetEnemyColor(IsEnemy)
         if IsEnemy then
@@ -59,7 +66,7 @@ local EntityLib = {}; do
         end
 
         return Color3.new(0.470588, 1, 0.470588);
-    end
+    end;
 
     function EntityLib:GetColorFromEntity(Ent, UseTeamColor, Custom, Rainbow, Color)
         if Ent.Team and Ent.Team.TeamColor.Color and UseTeamColor then
@@ -75,11 +82,11 @@ local EntityLib = {}; do
         end
 
         return self:GetEnemyColor(Ent.Targetable)
-    end
+    end;
 
     function EntityLib:TeleportTo(Position)
         Entity.character.HumanoidRootPart.CFrame = CFrame.new(Position)
-    end
+    end;
 
     function EntityLib:MoveTo(Position, Wait)
         local Path = PathfindingService:FindPathAsync(Entity.character.HumanoidRootPart.Position, Position);
@@ -125,6 +132,82 @@ local EntityLib = {}; do
             Entity.character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0);
         end)
     end
+
+    function EntityLib:DrawPath(Position, Toggle)
+        local LoopToggle = Toggle;
+        if Toggle then
+            local LastUpdate = tick();
+            local Path = PathfindingService:FindPathAsync(Entity.character.HumanoidRootPart.Position, Position);
+            local Waypoints = Path:GetWaypoints();
+
+            if #Waypoints == 0 then
+                return;
+            end
+
+            local Lines = {}
+
+            for Waypoint = 1, #Waypoints do
+                local Line = Drawing.new("Line");
+
+                Line.Visible = true;
+
+                Line.From = WorldToPoint(Waypoints[Waypoint].Position);
+
+                local LineTo;
+                if Waypoints[Waypoint + 1] then
+                    LineTo = Waypoints[Waypoint + 1].Position;
+                else
+                    LineTo = Position;
+                end
+
+                Line.To = WorldToPoint(LineTo);
+
+                Line.Color = Color3.fromRGB(255, 255, 255);
+                Line.Thickness = 2;
+                Line.Transparency = 1;
+
+                table.insert(Lines, {
+                    Line = Line,
+                    To = LineTo,
+                    From = Waypoints[Waypoint].Position
+                });
+            end;
+
+            task.spawn(function()
+                while LoopToggle do task.wait()
+                    for _, Line in next, Lines do
+                        local _, OnScreen = Camera:WorldToViewportPoint(Line.From);
+                        local Distance = (Entity.character.HumanoidRootPart.Position - Position).Magnitude;
+
+                        if OnScreen then
+                            Line.Line.Visible = true;
+                        else
+                            Line.Line.Visible = false;
+                        end
+
+                        if Distance <= 5 then
+                            for _, Line in next, Lines do
+                                Line.Line:Destroy();
+                            end
+                            table.clear(Lines);
+                        end
+
+                        if #Lines > 0 then
+                            if tick() - LastUpdate >= 60 then
+                                for _, Line in next, Lines do
+                                    Line.Line:Destroy();
+                                end
+                                table.clear(Lines);
+                            end
+                        end
+
+                        Line.Line.From = WorldToPoint(Line.From);
+                        Line.Line.To = WorldToPoint(Line.To);
+                    end
+                end
+            end)
+        end
+    end;
 end
 
 Entity = EntityLib:Run(EntityLib:Require("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/Libraries/entityHandler.lua", true, true));
