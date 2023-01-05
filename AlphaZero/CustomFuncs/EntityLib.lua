@@ -133,7 +133,7 @@ local EntityLib = {}; do
         end)
     end
 
-    function EntityLib:DrawPath(Position, Toggle)
+    function EntityLib:DrawPath(Position, Color, Toggle)
         local LoopToggle = Toggle;
         if Toggle then
             local LastUpdate = tick();
@@ -162,7 +162,7 @@ local EntityLib = {}; do
 
                 Line.To = WorldToPoint(LineTo);
 
-                Line.Color = Color3.fromRGB(255, 255, 255);
+                Line.Color = Color
                 Line.Thickness = 2;
                 Line.Transparency = 1;
 
@@ -203,6 +203,7 @@ local EntityLib = {}; do
 
                         Line.Line.From = WorldToPoint(Line.From);
                         Line.Line.To = WorldToPoint(Line.To);
+                        Line.Line.Color = Color;
                     end
                 end
             end)
