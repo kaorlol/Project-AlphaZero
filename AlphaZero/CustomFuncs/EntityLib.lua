@@ -120,7 +120,7 @@ local EntityLib = {}; do
 
         if Path.Status == Enum.PathStatus.Success then
             for _, Line in next, Lines do
-                Line.Line:Destroy();
+                Line:Destroy();
             end
             table.clear(Lines);
         end
