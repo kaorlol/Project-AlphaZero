@@ -25,14 +25,32 @@ local EntityLib = {}; do
         return Function()
     end
 
-    function EntityLib:IsAlive(Player, StateCheck)
-        if not Player then
-            return Entity.isAlive;
+    function EntityLib:GetPlayerNames()
+        local PlayerNames = {};
+
+        for _, Player in next, Entity.entityList do
+            table.insert(PlayerNames, Player.Player.Name);
         end
 
-        local _, Ent = Entity.getEntityFromPlayer(Player)
+        return PlayerNames;
+    end
 
-        return ((not StateCheck) or Ent and Ent.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead) and Ent;
+    function EntityLib:IsAlive(Thing, StateCheck)
+        if table.find(self:GetPlayerNames(), Thing.Name) then
+            if not Thing then
+                return Entity.isAlive;
+            end
+
+            local _, Ent = Entity.getEntityFromPlayer(Thing)
+
+            return ((not StateCheck) or Ent and Ent.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead) and Ent;
+        else
+            if not Thing then
+                return false;
+            end
+
+            return ((not StateCheck) or Thing and Thing.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead) and Thing;
+        end
     end
 
     function EntityLib:GetEnemyColor(IsEnemy)
