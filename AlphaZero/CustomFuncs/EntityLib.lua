@@ -36,19 +36,19 @@ local EntityLib = {}; do
     end
 
     function EntityLib:IsAlive(Thing, StateCheck)
-        if table.find(self:GetPlayerNames(), Thing.Name) then
-            if not Thing then
-                return Entity.isAlive;
-            end
+        if StateCheck ~= false and not StateCheck then
+            StateCheck = true;
+        end
 
-            local _, Ent = Entity.getEntityFromPlayer(Thing)
+        if not Thing then
+            return Entity.isAlive;
+        end
+
+        if table.find(self:GetPlayerNames(), Thing.Name) then
+            local _, Ent = Entity.getEntityFromPlayer(Thing);
 
             return ((not StateCheck) or Ent and Ent.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead) and Ent;
         else
-            if not Thing then
-                return false;
-            end
-
             return ((not StateCheck) or Thing and Thing.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead) and Thing;
         end
     end
