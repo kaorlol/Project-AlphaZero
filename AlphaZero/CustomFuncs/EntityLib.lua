@@ -64,15 +64,7 @@ local EntityLib = {}; do
     end
 
     function EntityLib:MoveTo(Position, Wait)
-        local Start;
-
-        if Entity.character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
-            Start = Entity.character.UpperTorso or Entity.character.Torso;
-        elseif Entity.character.Humanoid.RigType == Enum.HumanoidRigType.R6 then
-            Start = Entity.character.HumanoidRootPart;
-        end
-
-        local Path = PathfindingService:FindPathAsync(Start.Position, Position);
+        local Path = PathfindingService:FindPathAsync(Entity.character.HumanoidRootPart.Position, Position);
         local Waypoints = Path:GetWaypoints();
 
         if #Waypoints == 0 then
