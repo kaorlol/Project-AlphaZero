@@ -195,7 +195,7 @@ local EntityLib = {}; do
 
                         Line.Line.From = WorldToPoint(Line.From);
                         Line.Line.To = WorldToPoint(Line.To);
-                        Line.Line.Color = Color3.new(1, 1, 1);;
+                        Line.Line.Color = Color3.new(1, 1, 1);
                     end
                 end
             end)
