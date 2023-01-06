@@ -48,7 +48,7 @@ local EntityLib = {}; do
             return Entity.isAlive;
         end
 
-        if StateCheck ~= false and not StateCheck then
+        if StateCheck == nil then
             StateCheck = true;
         end
 
