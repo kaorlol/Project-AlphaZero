@@ -3,7 +3,7 @@ local Entity = nil;
 local PathfindingService = game:GetService("PathfindingService");
 local TweenService = game:GetService("TweenService");
 local Camera = workspace.CurrentCamera;
-local Lines = {}
+local Lines = {};
 
 local function WorldToPoint(Position)
     local Vector,_ = Camera:WorldToViewportPoint(Position);
@@ -32,6 +32,24 @@ local EntityLib = {}; do
 
         return Function()
     end;
+
+    function EntityLib:GetCodes(Url)
+        local Codes = {};
+        local Success, Response = pcall(Request, {
+            Url = Url;
+            Method = "GET";
+        })
+
+        if Success then
+            for Code in Response.Body:gmatch("<strong>(.-)</strong>") do
+                if not Code:find(" ") then
+                    table.insert(Codes, Code)
+                end
+            end
+        end
+
+        return Codes
+    end
 
     function EntityLib:GetPlayerNames()
         local PlayerNames = {};
