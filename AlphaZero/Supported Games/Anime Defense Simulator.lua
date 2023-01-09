@@ -56,7 +56,7 @@ if game.PlaceId == 11884594868 then
 
     local function GetOpenRoom()
         for _, Room in next, workspace.Client.Rooms:GetChildren() do
-            if Room and GetChild("UID", Room["UI_Interface"].Frame.PlayersFrame).Text:match("0/") then
+            if Room and GetChild("UID", Room:WaitForChild("UI_Interface").Frame.PlayersFrame).Text:match("0/") then
                 return Room;
             end
         end
@@ -79,7 +79,7 @@ else
                 local TeleportBack = GetChild("TeleportBack", LocalPlayer.PlayerGui.UI.CenterFrame);
                 if not JoinTP then
                     --Entity.character.HumanoidRootPart.CFrame = GetChild("8", workspace.Server.PointsMob).CFrame;
-                    EntityFuncs:MoveTo(GetChild("8", workspace.Server.PointsMob).Position, true);
+                    EntityFuncs:MoveTo(GetChild("8", Server.PointsMob).Position, true);
                     JoinTP = true;
                 end
 
