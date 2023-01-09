@@ -79,7 +79,7 @@ else
                 local TeleportBack = GetChild("TeleportBack", LocalPlayer.PlayerGui.UI.CenterFrame);
                 if not JoinTP then
                     --Entity.character.HumanoidRootPart.CFrame = GetChild("8", workspace.Server.PointsMob).CFrame;
-                    EntityFuncs:MoveTo(GetChild("8", Server.PointsMob).Position, true);
+                    EntityFuncs:MoveTo(GetChild("8", workspace.Server.PointsMob).Position, true);
                     JoinTP = true;
                 end
 
