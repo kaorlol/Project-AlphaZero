@@ -62,7 +62,8 @@ if game.PlaceId == 11884594868 then
         end
     end
     task.wait(1)
-    Entity.character.HumanoidRootPart.CFrame = GetOpenRoom().CFrame * CFrame.new(-5, -5, 0);
+    --Entity.character.HumanoidRootPart.CFrame = GetOpenRoom().CFrame * CFrame.new(-5, -5, 0);
+    EntityFuncs:MoveTo(Vector3.new(GetOpenRoom().CFrame * CFrame.new(-5, -5, 0)), true);
     task.wait(1)
     local InteractButton = GetChild("TextButton", LocalPlayer.PlayerGui.UI.Client.Modules.InteractSettings.InteractFrame.Frame);
     firesignal(InteractButton.MouseButton1Click)
@@ -81,14 +82,10 @@ else
                     JoinTP = true;
                 end
 
-                if JoinNewGameOnEnd then
-                    if TeleportBack:GetPropertyChangedSignal("Visible") == true then
-                        firesignal(GetChild("TextButton", TeleportBack.Close).MouseButton1Click);
-                    end
-                else
-                    if TeleportBack:GetPropertyChangedSignal("Visible") == true then
-                        firesignal(GetChild("TextButton", TeleportBack.Teleport).MouseButton1Click);
-                    end
+                if JoinNewGameOnEnd and TeleportBack.Visible then
+                    firesignal(GetChild("TextButton", TeleportBack.Close).MouseButton1Click);
+                elseif not JoinNewGameOnEnd and TeleportBack.Visible then
+                    firesignal(GetChild("TextButton", TeleportBack.Teleport).MouseButton1Click);
                 end
             end)
 
