@@ -84,9 +84,9 @@ else
                 end
 
                 if JoinNewGameOnEnd and TeleportBack.Visible then
-                    firesignal(GetChild("TextButton", TeleportBack.Close).MouseButton1Click);
-                elseif not JoinNewGameOnEnd and TeleportBack.Visible then
                     firesignal(GetChild("TextButton", TeleportBack.Teleport).MouseButton1Click);
+                elseif not JoinNewGameOnEnd and TeleportBack.Visible then
+                    firesignal(GetChild("TextButton", TeleportBack.Close).MouseButton1Click);
                 end
             end)
 
@@ -104,3 +104,7 @@ end
 Network:QueueOnTeleport([[
     loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Anime%20Defense%20Simulator.lua")))();
 ]])
+
+-- local AnimationHandler = getsenv(workspace.Uvxtq.Animate)
+
+-- AnimationHandler.playAnimation("walk", 0.1, Entity.character.Humanoid);
