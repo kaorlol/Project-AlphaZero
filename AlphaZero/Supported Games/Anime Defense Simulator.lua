@@ -55,14 +55,20 @@ if game.PlaceId == 11884594868 then
     firesignal(TeleportButton.MouseButton1Click)
 
     local function GetOpenRoom()
+        local HighestPlayers = 0;
+        local HighestRoom = nil;
+
         for _, Room in next, workspace.Client.Rooms:GetChildren() do
-            if Room and GetChild("UID", Room:WaitForChild("UI_Interface").Frame.PlayersFrame).Text:match("0/") then
-                return Room;
+            local Players = tonumber(GetChild("UID", Room:WaitForChild("UI_Interface").Frame.PlayersFrame).Text:split("/")[1]);
+            if Players > HighestPlayers then
+                HighestPlayers = Players;
+                HighestRoom = Room;
             end
         end
+
+        return HighestRoom;
     end
     task.wait(1)
-    --Entity.character.HumanoidRootPart.CFrame = GetOpenRoom().CFrame * CFrame.new(-5, -5, 0);
     EntityFuncs:MoveTo(GetOpenRoom().Position + Vector3.new(-5, -5, 0), true);
     task.wait(1)
     local InteractButton = GetChild("TextButton", LocalPlayer.PlayerGui.UI.Client.Modules.InteractSettings.InteractFrame.Frame);
@@ -78,7 +84,6 @@ else
             task.spawn(function()
                 local TeleportBack = GetChild("TeleportBack", LocalPlayer.PlayerGui.UI.CenterFrame);
                 if not JoinTP then
-                    --Entity.character.HumanoidRootPart.CFrame = GetChild("8", workspace.Server.PointsMob).CFrame;
                     EntityFuncs:MoveTo(GetChild("8", workspace.Server.PointsMob).Position, true);
                     JoinTP = true;
                 end
@@ -95,7 +100,13 @@ else
             Network:Send(Server, AttackArgs());
 
             if ClosestMobFromEnd then
-                EntityFuncs:MoveTo(ClosestMobFromEnd.HumanoidRootPart.Position, false);
+                local Distance = (ClosestMobFromEnd.HumanoidRootPart.Position - Entity.character.HumanoidRootPart.Position).Magnitude;
+
+                if Distance <= 25 then
+                    EntityFuncs:MoveTo(ClosestMobFromEnd.HumanoidRootPart.Position, false);
+                else
+                    EntityFuncs:MoveTo(ClosestMobFromEnd.HumanoidRootPart.Position, true);
+                end
             end
         end
     end)
