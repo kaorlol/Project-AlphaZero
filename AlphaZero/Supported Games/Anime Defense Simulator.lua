@@ -63,7 +63,7 @@ if game.PlaceId == 11884594868 then
     end
     task.wait(1)
     --Entity.character.HumanoidRootPart.CFrame = GetOpenRoom().CFrame * CFrame.new(-5, -5, 0);
-    EntityFuncs:MoveTo(Vector3.new(GetOpenRoom().CFrame * CFrame.new(-5, -5, 0)), true);
+    EntityFuncs:MoveTo(GetOpenRoom().Position + Vector3.new(-5, -5, 0), true);
     task.wait(1)
     local InteractButton = GetChild("TextButton", LocalPlayer.PlayerGui.UI.Client.Modules.InteractSettings.InteractFrame.Frame);
     firesignal(InteractButton.MouseButton1Click)
@@ -78,7 +78,8 @@ else
             task.spawn(function()
                 local TeleportBack = GetChild("TeleportBack", LocalPlayer.PlayerGui.UI.CenterFrame);
                 if not JoinTP then
-                    Entity.character.HumanoidRootPart.CFrame = GetChild("8", workspace.Server.PointsMob).CFrame;
+                    --Entity.character.HumanoidRootPart.CFrame = GetChild("8", workspace.Server.PointsMob).CFrame;
+                    EntityFuncs:MoveTo(GetChild("8", workspace.Server.PointsMob).Position, true);
                     JoinTP = true;
                 end
 
