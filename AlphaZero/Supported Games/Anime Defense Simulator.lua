@@ -104,5 +104,5 @@ else
 end
 
 Network:QueueOnTeleport([[
-    loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Loader.lua")))();
+    loadstring(game:HttpGet(("https://raw.githubusercontent.com/Uvxtq/Project-AlphaZero/main/AlphaZero/Supported%20Games/Anime%20Defense%20Simulator.lua")))();
 ]])
