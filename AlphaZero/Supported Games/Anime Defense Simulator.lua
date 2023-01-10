@@ -69,15 +69,22 @@ if game.PlaceId == 11884594868 then
         return HighestRoom;
     end
     task.wait(1)
-    EntityFuncs:MoveTo(GetOpenRoom().Position + Vector3.new(-5, -5, 0), true);
+    if GetOpenRoom() then
+        EntityFuncs:MoveTo(GetOpenRoom().Position + Vector3.new(-5, -5, 0), true);
+    else
+        local RandomRoom = workspace.Client.Rooms:GetChildren()[math.random(1, #workspace.Client.Rooms:GetChildren())];
+        EntityFuncs:MoveTo(RandomRoom.Position + Vector3.new(-5, -5, 0), true);
+    end
     task.wait(1)
     local InteractButton = GetChild("TextButton", LocalPlayer.PlayerGui.UI.Client.Modules.InteractSettings.InteractFrame.Frame);
     firesignal(InteractButton.MouseButton1Click)
     task.wait(1)
-    Network:Send(Server, {
-        "MapSelect",
-        "Demon Slayer"
-    });
+    while true do task.wait(1)
+        Network:Send(Server, {
+            "MapSelect",
+            "Demon Slayer"
+        });
+    end
 else
     task.spawn(function()
         while true do task.wait()
