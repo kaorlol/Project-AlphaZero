@@ -2679,8 +2679,9 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = minimumValue + (maxMinRange * percentOfBarFilled)
 			end
 			
-			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
-			callback(math.floor(sliderValue * 10^2 + 0.5) / 10^2)
+            local RealValue = math.floor(sliderValue * 10^GetDecimalPlaces(maximumValue) + 0.5) / 10^GetDecimalPlaces(maximumValue)
+			sliderInstance.TextGrouping.NumberText.Text = RealValue
+			callback(RealValue)
 		end
 
 		onMouseMoved()
@@ -2702,18 +2703,19 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				local absSize = sliderBar.Parent.EmptySliderBackground.AbsoluteSize
 				local percentOfBarFilled = enteredNum / absSize.X
 				sliderValue = enteredNum
-				sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
+                local RealValue = math.floor(sliderValue * 10^GetDecimalPlaces(maximumValue) + 0.5) / 10^GetDecimalPlaces(maximumValue)
+				sliderInstance.TextGrouping.NumberText.Text = RealValue
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
-				callback(math.floor(sliderValue * 10^2 + 0.5) / 10^2)
+				callback(RealValue)
 			else
 				sliderInstance.TextGrouping.NumberText.Text = "ERR"
 				task.wait(.5)
 				if sliderInstance.TextGrouping.NumberText.Text == "ERR" then
-					sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
+					sliderInstance.TextGrouping.NumberText.Text = RealValue
 				end
 			end
 		else
-			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
+			sliderInstance.TextGrouping.NumberText.Text = RealValue
 		end
 	end
 	
