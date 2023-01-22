@@ -2680,7 +2680,7 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 			end
 			
 			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
-			callback(sliderValue)
+			callback(math.floor(sliderValue * 10^2 + 0.5) / 10^2)
 		end
 
 		onMouseMoved()
@@ -2704,7 +2704,7 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = enteredNum
 				sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
-				callback(sliderValue)
+				callback(math.floor(sliderValue * 10^2 + 0.5) / 10^2)
 			else
 				sliderInstance.TextGrouping.NumberText.Text = "ERR"
 				task.wait(.5)
