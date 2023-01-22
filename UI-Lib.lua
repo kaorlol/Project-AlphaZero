@@ -2619,6 +2619,16 @@ function dropdownHandler:ChangeText(newText: string)
 	self.IdentifierText = newText
 end
 
+local function GetDecimalPlaces(Number)
+    local DecimalPlaces = 0
+    local NumberString = tostring(Number)
+    local DecimalIndex = string.find(NumberString, ".", 1, true)
+    if DecimalIndex then
+        DecimalPlaces = string.len(NumberString) - DecimalIndex
+    end
+    return DecimalPlaces
+end
+
 function elementHandler:Slider(sliderName: string, callback, maximumValue: number, minimumValue: number): table
 	local slider = setmetatable({}, sliderHandler) -- MAKE RIGHT CLICK AND BAR GOES TO MID
 	local sliderInstance = originalElements.Slider:Clone()
@@ -2669,13 +2679,13 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = minimumValue + (maxMinRange * percentOfBarFilled)
 			end
 			
-			sliderInstance.TextGrouping.NumberText.Text = sliderValue
+			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
 			callback(sliderValue)
 		end
-		
+
 		onMouseMoved()
 		sliderConnection = mouse.Move:Connect(onMouseMoved)
-		
+
 		endInputConnection = UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 then
 				sliderConnection:Disconnect()
@@ -2683,7 +2693,7 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 			end
 		end)
 	end
-	
+
 	local function onFocusLost(enterPressed)
 		if enterPressed then
 			local enteredNum = tonumber(sliderInstance.TextGrouping.NumberText.Text)
@@ -2692,18 +2702,18 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				local absSize = sliderBar.Parent.EmptySliderBackground.AbsoluteSize
 				local percentOfBarFilled = enteredNum / absSize.X
 				sliderValue = enteredNum
-				sliderInstance.TextGrouping.NumberText.Text = sliderValue
+				sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
 				callback(sliderValue)
 			else
 				sliderInstance.TextGrouping.NumberText.Text = "ERR"
 				task.wait(.5)
 				if sliderInstance.TextGrouping.NumberText.Text == "ERR" then
-					sliderInstance.TextGrouping.NumberText.Text = sliderValue
+					sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
 				end
 			end
 		else
-			sliderInstance.TextGrouping.NumberText.Text = sliderValue
+			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue * 10^2 + 0.5) / 10^2
 		end
 	end
 	
