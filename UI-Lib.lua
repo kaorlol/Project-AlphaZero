@@ -2679,8 +2679,8 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = minimumValue + (maxMinRange * percentOfBarFilled)
 			end
 			
-            local NewVal = math.floor(100+GetDecimalPlaces(Number))
-            local RealValue = math.floor(sliderValue * 10^NewVal) / 10^NewValNewVal
+            local NewVal = math.floor(100+GetDecimalPlaces(sliderValue))
+            local RealValue = math.floor(sliderValue * 10^NewVal) / 10^NewVal
 			sliderInstance.TextGrouping.NumberText.Text = RealValue
 			callback(RealValue)
 		end
@@ -2705,8 +2705,8 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				local absSize = sliderBar.Parent.EmptySliderBackground.AbsoluteSize
 				local percentOfBarFilled = enteredNum / absSize.X
 				sliderValue = enteredNum
-                local NewVal = math.floor(100+GetDecimalPlaces(Number))
-                RealValue = math.floor(sliderValue * 10^NewVal) / 10^NewValNewVal
+                local NewVal = math.floor(100+GetDecimalPlaces(sliderValue))
+                RealValue = math.floor(sliderValue * 10^NewVal) / 10^NewVal
 				sliderInstance.TextGrouping.NumberText.Text = RealValue
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
 				callback(RealValue)
