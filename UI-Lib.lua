@@ -2679,7 +2679,8 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = minimumValue + (maxMinRange * percentOfBarFilled)
 			end
 			
-            local RealValue = math.floor(sliderValue * 10^GetDecimalPlaces(maximumValue) + 0.5) / 10^GetDecimalPlaces(maximumValue)
+            local NewVal = math.floor(100+GetDecimalPlaces(Number))
+            local RealValue = math.floor(sliderValue * 10^NewVal) / 10^NewValNewVal
 			sliderInstance.TextGrouping.NumberText.Text = RealValue
 			callback(RealValue)
 		end
@@ -2696,6 +2697,7 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 	end
 
 	local function onFocusLost(enterPressed)
+        local RealValue;
 		if enterPressed then
 			local enteredNum = tonumber(sliderInstance.TextGrouping.NumberText.Text)
 			if typeof(enteredNum) == "number" and enteredNum >= minimumValue and enteredNum <= maximumValue then
@@ -2703,7 +2705,8 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				local absSize = sliderBar.Parent.EmptySliderBackground.AbsoluteSize
 				local percentOfBarFilled = enteredNum / absSize.X
 				sliderValue = enteredNum
-                local RealValue = math.floor(sliderValue * 10^GetDecimalPlaces(maximumValue) + 0.5) / 10^GetDecimalPlaces(maximumValue)
+                local NewVal = math.floor(100+GetDecimalPlaces(Number))
+                RealValue = math.floor(sliderValue * 10^NewVal) / 10^NewValNewVal
 				sliderInstance.TextGrouping.NumberText.Text = RealValue
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
 				callback(RealValue)
