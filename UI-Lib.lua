@@ -2619,7 +2619,7 @@ function dropdownHandler:ChangeText(newText: string)
 	self.IdentifierText = newText
 end
 
-function elementHandler:Slider(sliderName: string, callback, maximumValue: number, minimumValue: number): table
+function elementHandler:Slider(sliderName: string, callback, maximumValue: number, minimumValue: number, Increment: number): table
 	local slider = setmetatable({}, sliderHandler) -- MAKE RIGHT CLICK AND BAR GOES TO MID
 	local sliderInstance = originalElements.Slider:Clone()
 	local isMouseDown = false
@@ -2669,8 +2669,8 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = minimumValue + (maxMinRange * percentOfBarFilled)
 			end
 			
-			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / 1 + 0.5) * (1 * 10000000) / 10000000
-			callback(math.floor(sliderValue / 1 + 0.5) * (1 * 10000000) / 10000000)
+			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / Increment + 0.5) * (Increment * 10000000) / 10000000
+			callback(math.floor(sliderValue / Increment + 0.5) * (Increment * 10000000) / 10000000)
 		end
 
 		onMouseMoved()
@@ -2692,18 +2692,18 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				local absSize = sliderBar.Parent.EmptySliderBackground.AbsoluteSize
 				local percentOfBarFilled = enteredNum / absSize.X
 				sliderValue = enteredNum
-				sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / 1 + 0.5) * (1 * 10000000) / 10000000
+				sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / Increment + 0.5) * (Increment * 10000000) / 10000000
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
-				callback(math.floor(sliderValue / 1 + 0.5) * (1 * 10000000) / 10000000)
+				callback(math.floor(sliderValue / Increment + 0.5) * (Increment * 10000000) / 10000000)
 			else
 				sliderInstance.TextGrouping.NumberText.Text = "ERR"
 				task.wait(.5)
 				if sliderInstance.TextGrouping.NumberText.Text == "ERR" then
-					sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / 1 + 0.5) * (1 * 10000000) / 10000000
+					sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / Increment + 0.5) * (Increment * 10000000) / 10000000
 				end
 			end
 		else
-			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / 1 + 0.5) * (1 * 10000000) / 10000000
+			sliderInstance.TextGrouping.NumberText.Text = math.floor(sliderValue / Increment + 0.5) * (Increment * 10000000) / 10000000
 		end
 	end
 	
