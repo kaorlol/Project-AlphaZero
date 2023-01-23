@@ -115,8 +115,8 @@ local EntityLib = {}; do
         local Path = PathfindingService:FindPathAsync(Entity.character.HumanoidRootPart.Position, Position);
         local Waypoints = Path:GetWaypoints();
 
-        if #Waypoints == 0 then
-            self:TeleportTo(Position);
+        if Path.Status ~= Enum.PathStatus.Success then
+            return self:TeleportTo(Position);
         end
 
         for Waypoint = 1, #Waypoints do
