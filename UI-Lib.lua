@@ -2619,7 +2619,7 @@ function dropdownHandler:ChangeText(newText: string)
 	self.IdentifierText = newText
 end
 
-local function Round(Value, Increment)
+local function Round(Value, Min, Increment)
     local Rounded = math.floor((Value - Min) / Increment + 0.5) * Increment + Min;
 
     if string.find(tostring(Rounded), "3") then
@@ -2680,8 +2680,8 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				sliderValue = minimumValue + (maxMinRange * percentOfBarFilled)
 			end
 			
-			sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, Increment)
-			callback(Round(sliderValue, Increment))
+			sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, minimumValue, Increment)
+			callback(Round(sliderValue, minimumValue, Increment))
 		end
 
 		onMouseMoved()
@@ -2703,18 +2703,18 @@ function elementHandler:Slider(sliderName: string, callback, maximumValue: numbe
 				local absSize = sliderBar.Parent.EmptySliderBackground.AbsoluteSize
 				local percentOfBarFilled = enteredNum / absSize.X
 				sliderValue = enteredNum
-				sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, Increment)
+				sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, minimumValue, Increment)
 				sliderBar.Size = UDim2.new((sliderValue - minimumValue) / maxMinRange,0,1,0)
-				callback(Round(sliderValue, Increment))
+				callback(Round(sliderValue, minimumValue, Increment))
 			else
 				sliderInstance.TextGrouping.NumberText.Text = "ERR"
 				task.wait(.5)
 				if sliderInstance.TextGrouping.NumberText.Text == "ERR" then
-					sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, Increment)
+					sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, minimumValue, Increment)
 				end
 			end
 		else
-			sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, Increment)
+			sliderInstance.TextGrouping.NumberText.Text = Round(sliderValue, minimumValue, Increment)
 		end
 	end
 	
