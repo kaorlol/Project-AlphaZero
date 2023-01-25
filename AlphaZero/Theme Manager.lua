@@ -86,34 +86,6 @@ local ThemeManager = {} do
 
         groupbox:AddToggle("Rainbow", {Text = "Rainbow Accent Color"});
 
-        task.spawn(function()
-            while game:GetService('RunService').RenderStepped:Wait() do
-                if not self.Library then break; end
-
-                if Toggles.Rainbow.Value then
-                    local Registry = Window.Holder.Visible and Library.Registry or Library.HudRegistry;
-
-                    for _, Object in next, Registry do
-                        for Property, ColorIdx in next, Object.Properties do
-                            if ColorIdx == 'AccentColor' or ColorIdx == 'AccentColorDark' then
-                                local Instance = Object.Instance;
-                                local yPos = Instance.AbsolutePosition.Y;
-
-                                local Mapped = Library:MapValue(yPos, 0, 1080, 0, 0.5) * 1.5;
-                                local Color = Color3.fromHSV((Library.CurrentRainbowHue - Mapped) % 1, 0.8, 1);
-
-                                if ColorIdx == 'AccentColorDark' then
-                                    Color = Library:GetDarkerColor(Color);
-                                end
-
-                                Instance[Property] = Color;
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-
 		local ThemesArray = {}
 		for Name, Theme in next, self.BuiltInThemes do
 			table.insert(ThemesArray, Name)
@@ -281,11 +253,5 @@ local ThemeManager = {} do
 
 	ThemeManager:BuildFolderTree()
 end
-
-Toggles.Rainbow:OnChanged(function()
-    if not Toggles.Rainbow.Value then
-        ThemeManager:ThemeUpdate()
-    end
-end)
 
 return ThemeManager
