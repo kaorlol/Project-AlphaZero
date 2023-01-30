@@ -801,28 +801,24 @@ Toggles["Auto Attack Meteors"]:OnChanged(function()
                             PrimaryPart.Parent
                         });
                     else
-                        local Distance = (Entity.character.HumanoidRootPart.Position - PrimaryPart.Position).Magnitude;
+                        if World.Name ~= CurrentWorld.Name and WorldCheck(World) == false then
+                            if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
+                                Client.Locals["Attacking Meteor"] = true;
 
-                        if Distance <= 2000 then
-                            if World.Name ~= CurrentWorld.Name and WorldCheck(World) == false then
-                                if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
-                                    Client.Locals["Attacking Meteor"] = true;
+                                Client.Server:FireServer({
+                                    "Teleport",
+                                    WorldIndex
+                                });
 
-                                    Client.Server:FireServer({
-                                        "Teleport",
-                                        WorldIndex
-                                    });
-
-                                    task.wait(3);
-                                end
+                                task.wait(3);
                             end
+                        end
 
-                            if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false and WorldCheck(World) == false then
-                                if Distance <= 2000 then
-                                    Client.Locals["Attacking Meteor"] = true;
+                        if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false and WorldCheck(World) == false then
+                            if Distance <= 2000 then
+                                Client.Locals["Attacking Meteor"] = true;
 
-                                    Utilities:TpMethod(Client.Locals["Teleport Method"], PrimaryPart.Position);
-                                end
+                                Utilities:TpMethod(Client.Locals["Teleport Method"], PrimaryPart.Position);
                             end
                         end
                     end
@@ -905,7 +901,7 @@ Toggles["Auto Attack Boss"]:OnChanged(function()
                 local WorldIndex = GetIndex(World);
                 local Distance = (Entity.character.HumanoidRootPart.Position - BossPosition).Magnitude;
 
-                if Distance <= 5 then
+                if Distance <= 5 and WorldCheck(World) == false then
                     Client.Server:FireServer({
                         "Hit",
                         Boss
