@@ -1014,7 +1014,7 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
                 end
             end
 
-            task.wait(0.5);
+            task.wait(0.1);
         end
     end)
 end)
@@ -1145,7 +1145,7 @@ local function GetNormalPets()
 end
 
 MiscTab:AddToggle("Auto Craft Pets", {
-    Text = "Auto Craft Pets",
+    Text = "Auto Make Pet Shiny",
     Default = false,
     Tooltip = "Auto craft pets will craft pets for you.",
 })
@@ -1157,35 +1157,29 @@ Toggles["Auto Craft Pets"]:OnChanged(function()
             if not Entity.isAlive then return; end
 
             local Pets = GetNormalPets();
-            local Ids = {};
+            local FirstFound = nil;
             local CraftArgs = {
                 "ShinyMachine",
                 {}
             };
 
             for _, Pet in next, Pets do
-                if not Ids[Pet.data.id.Value] then
-                    Ids[Pet.data.id.Value] = 1;
-                else
-                    Ids[Pet.data.id.Value] = Ids[Pet.data.id.Value] + 1;
-                end
-            end
-
-            for Id, Count in next, Ids do
-                if Count >= 5 then
-                    for _, Pet in next, Pets do
-                        if Pet.data.id.Value == Id and Pet.Equipped.Visible == false and #CraftArgs[2] < 5 then
+                if Pet.Equipped.Visible == false then
+                    for i = 1, 5 do
+                        if FirstFound == nil or Pet.data.uuid.Value == FirstFound then
+                            FirstFound = Pet.data.uuid.Value;
                             table.insert(CraftArgs[2], Pet.data.uuid.Value);
                         end
                     end
                 end
             end
 
-            if #CraftArgs[2] >= 5 then
+            if #CraftArgs[2] == 5 then
                 Client.Server:FireServer(CraftArgs);
+                FirstFound = nil;
             end
 
-            task.wait(5);
+            task.wait(0.1);
         end
     end)
 end)
