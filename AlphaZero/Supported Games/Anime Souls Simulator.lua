@@ -109,6 +109,8 @@ local Client = {
     };
 };
 
+local set_identity = typeof(syn) == "table" and syn.set_thread_identity or setthreadcontext or set_thread_context or setthreadidentity or set_thread_identity;
+
 local function ConvertToNumber(String)
     local Suffix = string.match(String, "%a+");
     local Number = string.gsub(String, "%a+", "");
@@ -330,6 +332,26 @@ local function GetClosestQuestEnemy()
     return Enemies[Index], Position;
 end
 
+local function GetPortal(Index)
+    for _, Portal in ipairs(workspace._PORTALS:GetChildren()) do
+        if Portal.Name == Index then
+            return Portal;
+        end
+    end
+
+    return nil;
+end
+
+local function GetTeleportGui(Index)
+    for _, Gui in ipairs(LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll:GetChildren()) do
+        if Gui.Name == Index then
+            return Gui;
+        end
+    end
+
+    return nil;
+end
+
 local NoclipConnection = nil;
 local Parts = {};
 local function Noclipfunction()
@@ -535,6 +557,9 @@ Toggles["Auto Quest"]:OnChanged(function()
             if Client.Locals["Attacking Meteor"] == false and Client.Locals["Attacking Boss"] == false then
                 local Quest = GetUncompletedQuest();
                 local Goal = nil;
+
+                repeat task.wait() until workspace["_MAP"]:GetChildren()[2];
+
                 local CurrentIsland = workspace["_MAP"]:GetChildren()[2].Name;
 
                 if Quest.Mural.SurfaceGui.Background.Objectives.main["in_progress"].Visible then
@@ -554,17 +579,18 @@ Toggles["Auto Quest"]:OnChanged(function()
                     });
                 end
 
-                if ClosestEnemy and Distance <= 10000 then
+                if ClosestEnemy then
                     QuestLabel:SetText(string.format("[Killing: %s] %s/%s kills", ClosestEnemy.Name, Kills, MaxKills));
                     --HitsUntilKill:SetText(string.format("Hits Until Kill: %s", GetHitsUntilKill(ClosestEnemy)));
 
                     if ClosestEnemy.Parent.Name ~= CurrentIsland then
-                        Client.Server:FireServer({
-                            "Teleport",
-                            GetIndex(ClosestEnemy.Parent)
-                        });
+                        Utilities:TpMethod(GetPortal(GetIndex(ClosestEnemy.Parent)).Range.Position);
 
-                        task.wait(3);
+                        set_identity(2)
+
+                        firesignal(GetTeleportGui(GetIndex(ClosestEnemy.Parent)).tp.MouseButton1Click);
+
+                        task.wait(5);
                     end
 
                     if Distance <= 5 then
@@ -572,7 +598,7 @@ Toggles["Auto Quest"]:OnChanged(function()
                             "Hit",
                             ClosestEnemy
                         });
-                    else
+                    elseif Distance > 5 and Distance <= 10000 then
                         Utilities:TpMethod(Client.Locals["Teleport Method"], EnemyPosition);
                     end
                 end
@@ -648,28 +674,27 @@ Toggles["Teleport To Enemy"]:OnChanged(function()
                 local EnemyPosition = Enemy and GetFeetPosition(Enemy.HumanoidRootPart, Enemy.HumanoidRootPart.Position) or nil;
                 local Distance = (Entity.character.HumanoidRootPart.Position - EnemyPosition).Magnitude;
 
-                if Enemy and Distance <= 2000 then
-                    Utilities:TpMethod(Client.Locals["Teleport Method"], EnemyPosition);
-                else
-                    local CurrentWorld = workspace._MAP:GetChildren()[2];
-                    local WorldIndex = GetIndex(Enemy.Parent);
+                local CurrentWorld = workspace._MAP:GetChildren()[2];
+                local WorldIndex = GetIndex(Enemy.Parent);
 
-                    if CurrentWorld.Name ~= Enemy.Parent.Name then
-                        if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
-                            Client.Server:FireServer({
-                                "Teleport",
-                                WorldIndex
-                            });
+                if CurrentWorld.Name ~= Enemy.Parent.Name then
+                    if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
+                        set_identity(2)
 
-                            task.wait(3);
+                        Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
 
-                            Utilities:TpMethod(Client.Locals["Teleport Method"], EnemyPosition);
-                        else
-                            GameNotify("Error", "You cannot teleport to this island.");
-                            Toggles["Teleport To Enemy"]:SetValue(false);
-                            break;
-                        end
+                        firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+
+                        task.wait(5);
+                    else
+                        GameNotify("Error", "You cannot teleport to this island.");
+                        Toggles["Teleport To Enemy"]:SetValue(false);
+                        break;
                     end
+                end
+
+                if Enemy and Distance <= 1000 then
+                    Utilities:TpMethod(Client.Locals["Teleport Method"], EnemyPosition);
                 end
             end
 
@@ -805,17 +830,18 @@ Toggles["Auto Attack Meteors"]:OnChanged(function()
                             if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
                                 Client.Locals["Attacking Meteor"] = true;
 
-                                Client.Server:FireServer({
-                                    "Teleport",
-                                    WorldIndex
-                                });
+                                set_identity(2)
 
-                                task.wait(3);
+                                Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+
+                                firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+
+                                task.wait(5);
                             end
                         end
 
                         if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false and WorldCheck(World) == false then
-                            if Distance <= 2000 then
+                            if Distance <= 1000 then
                                 Client.Locals["Attacking Meteor"] = true;
 
                                 Utilities:TpMethod(Client.Locals["Teleport Method"], PrimaryPart.Position);
@@ -901,7 +927,7 @@ Toggles["Auto Attack Boss"]:OnChanged(function()
                 local WorldIndex = GetIndex(World);
                 local Distance = (Entity.character.HumanoidRootPart.Position - BossPosition).Magnitude;
 
-                if Distance <= 5 and WorldCheck(World) == false then
+                if Distance <= 5 and BossWorldCheck(World) == false then
                     Client.Server:FireServer({
                         "Hit",
                         Boss
@@ -911,17 +937,18 @@ Toggles["Auto Attack Boss"]:OnChanged(function()
                         if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
                             Client.Locals["Attacking Boss"] = true;
 
-                            Client.Server:FireServer({
-                                "Teleport",
-                                WorldIndex
-                            });
+                            Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+                            
+                            set_identity(2)
 
-                            task.wait(3);
+                            firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+
+                            task.wait(5);
                         end
                     end
 
                     if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false and BossWorldCheck(World) == false then
-                        if Distance <= 2000 then
+                        if Distance <= 1000 then
                             Client.Locals["Attacking Boss"] = true;
 
                             Utilities:TpMethod(Client.Locals["Teleport Method"], BossPosition);
@@ -982,39 +1009,36 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
                     EggLabel:SetText("Amount you can buy: N/A : Error")
                 end)
 
+                local CurrentWorld = workspace._MAP:GetChildren()[2];
+                local WorldIndex = GetIndex(workspace._QUESTS[Client.Locals["Egg"]]);
+
+                if CurrentWorld.Name ~= workspace._EGGS[Client.Locals["Egg"]].Name then
+                    if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
+                        Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+
+                        set_identity(2)
+
+                        firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+
+                        task.wait(5);
+                    else
+                        GameNotify("Error", "You cannot teleport to this island.");
+                        Toggles["Auto Buy Egg"]:SetValue(false);
+                        break;
+                    end
+                end
+
                 if Distance <= 13 then
                     Client.Server:FireServer({
                         "BuyHeroes",
                         Client.Locals["Egg"]
                     });
                 else
-                    if Distance <= 2000 and Distance > 13 then
-                        Utilities:TpMethod(Client.Locals["Teleport Method"], workspace._EGGS[Client.Locals["Egg"]].WorldsPad.Position + Vector3.new(0, 5, 0));
-                    else
-                        local CurrentWorld = workspace._MAP:GetChildren()[2];
-                        local WorldIndex = GetIndex(workspace._QUESTS[Client.Locals["Egg"]]);
-
-                        if CurrentWorld.Name ~= workspace._EGGS[Client.Locals["Egg"]].Parent.Name then
-                            if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
-                                Client.Server:FireServer({
-                                    "Teleport",
-                                    WorldIndex
-                                });
-
-                                task.wait(3);
-
-                                Utilities:TpMethod(Client.Locals["Teleport Method"], EnemyPosition);
-                            else
-                                GameNotify("Error", "You cannot teleport to this island.");
-                                Toggles["Teleport To Enemy"]:SetValue(false);
-                                break;
-                            end
-                        end
-                    end
+                    Utilities:TpMethod(Client.Locals["Teleport Method"], workspace._EGGS[Client.Locals["Egg"]].WorldsPad.Position + Vector3.new(0, 5, 0));
                 end
             end
 
-            task.wait(0.1);
+            task.wait();
         end
     end)
 end)
