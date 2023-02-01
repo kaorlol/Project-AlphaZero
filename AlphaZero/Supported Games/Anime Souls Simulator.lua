@@ -484,6 +484,28 @@ local function GetClosestTeleporter()
     return Teleporters[Index], Position;
 end
 
+local MapGlitched = false;
+local function CheckIfBelowY()
+    local OceanY = workspace._MAP.Ocean["layer_1"].Position.Y;
+    local Player = game.Players.LocalPlayer;
+    local Character = Player.Character or Player.CharacterAdded:Wait();
+    local Humanoid = Character:WaitForChild("Humanoid");
+    local RootPart = Character:WaitForChild("HumanoidRootPart");
+
+    if RootPart.Position.Y < OceanY then
+        MapGlitched = true;
+
+        RootPart.CFrame = CFrame.new(0, 15, 0);
+    end
+end
+
+game.RunService.RenderStepped:Connect(function()
+    if Library.Unloaded then return; end
+    if not Entity.isAlive then return; end
+
+    CheckIfBelowY();
+end)
+
 if ScriptLoaded then
     GameNotify("Error", "Script already loaded, please unload the script before executing again.");
     return;
@@ -613,7 +635,15 @@ Toggles["Auto Quest"]:OnChanged(function()
 
                         TeleportToWorld(tonumber(GetIndex(ClosestEnemy.Parent)));
 
-                        task.wait(3);
+                        task.wait(1.5);
+
+                        if MapGlitched then
+                            MapGlitched = false;
+
+                            task.wait(1);
+
+                            TeleportToWorld(tonumber(GetIndex(ClosestEnemy.Parent)));
+                        end
                     end
 
                     if Distance <= 5 then
@@ -714,7 +744,15 @@ Toggles["Teleport To Enemy"]:OnChanged(function()
 
                         TeleportToWorld(tonumber(WorldIndex));
 
-                        task.wait(3);
+                        task.wait(1.5);
+
+                        if MapGlitched then
+                            MapGlitched = false;
+
+                            task.wait(1);
+
+                            TeleportToWorld(tonumber(WorldIndex));
+                        end
                     else
                         GameNotify("Error", "You cannot teleport to this island.");
                         Toggles["Teleport To Enemy"]:SetValue(false);
@@ -871,7 +909,15 @@ Toggles["Auto Attack Meteors"]:OnChanged(function()
 
                                 TeleportToWorld(tonumber(WorldIndex));
 
-                                task.wait(3);
+                                task.wait(1.5);
+
+                                if MapGlitched then
+                                    MapGlitched = false;
+        
+                                    task.wait(1);
+        
+                                    TeleportToWorld(tonumber(WorldIndex));
+                                end
                             end
                         end
 
@@ -984,7 +1030,15 @@ Toggles["Auto Attack Boss"]:OnChanged(function()
 
                             TeleportToWorld(tonumber(WorldIndex));
 
-                            task.wait(3);
+                            task.wait(1.5);
+
+                            if MapGlitched then
+                                MapGlitched = false;
+    
+                                task.wait(1);
+    
+                                TeleportToWorld(tonumber(WorldIndex));
+                            end
                         end
                     end
 
@@ -1067,7 +1121,15 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
 
                         TeleportToWorld(tonumber(WorldIndex));
 
-                        task.wait(3);
+                        task.wait(1.5);
+
+                        if MapGlitched then
+                            MapGlitched = false;
+
+                            task.wait(1);
+
+                            TeleportToWorld(tonumber(WorldIndex));
+                        end
                     else
                         GameNotify("Error", "You cannot teleport to this island.");
                         Toggles["Auto Buy Egg"]:SetValue(false);
@@ -1076,8 +1138,6 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
                 end
 
                 if Distance <= 13 then
-                    set_identity(8)
-
                     Client.Server:FireServer({
                         "BuyHeroes",
                         Client.Locals["Egg"]
