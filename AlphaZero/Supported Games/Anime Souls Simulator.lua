@@ -469,6 +469,21 @@ local function GetHitsUntilKill(Enemy)
     return math.ceil(Health / GetPlayerDamage());
 end
 
+local function GetClosestTeleporter()
+    local Teleporters = {};
+    local Positions = {};
+
+    for _, Teleporter in next, workspace["_INTERACTS"]:GetChildren() do
+        if Teleporter.Name == "Teleport" then
+            table.insert(Teleporters, Teleporter);
+            table.insert(Positions, Teleporter.Range.Position);
+        end
+    end
+
+    local Index, Position = GetNearestValue(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position, Positions);
+    return Teleporters[Index], Position;
+end
+
 if ScriptLoaded then
     GameNotify("Error", "Script already loaded, please unload the script before executing again.");
     return;
@@ -584,9 +599,13 @@ Toggles["Auto Quest"]:OnChanged(function()
                     --HitsUntilKill:SetText(string.format("Hits Until Kill: %s", GetHitsUntilKill(ClosestEnemy)));
 
                     if ClosestEnemy.Parent.Name ~= CurrentIsland then
-                        Utilities:TpMethod(GetPortal(GetIndex(ClosestEnemy.Parent)).Range.Position);
+                        local Teleporter, Position = GetClosestTeleporter();
+
+                        Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
 
                         set_identity(2)
+
+                        task.wait(1.5);
 
                         firesignal(GetTeleportGui(GetIndex(ClosestEnemy.Parent)).tp.MouseButton1Click);
 
@@ -679,9 +698,13 @@ Toggles["Teleport To Enemy"]:OnChanged(function()
 
                 if CurrentWorld.Name ~= Enemy.Parent.Name then
                     if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
+                        local Teleporter, Position = GetClosestTeleporter();
+
+                        Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+
                         set_identity(2)
 
-                        Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+                        task.wait(1.5);
 
                         firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
@@ -830,9 +853,13 @@ Toggles["Auto Attack Meteors"]:OnChanged(function()
                             if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
                                 Client.Locals["Attacking Meteor"] = true;
 
+                                local Teleporter, Position = GetClosestTeleporter();
+
+                                Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+
                                 set_identity(2)
 
-                                Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+                                task.wait(1.5);
 
                                 firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
@@ -937,9 +964,13 @@ Toggles["Auto Attack Boss"]:OnChanged(function()
                         if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
                             Client.Locals["Attacking Boss"] = true;
 
-                            Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+                            local Teleporter, Position = GetClosestTeleporter();
+
+                            Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
                             
                             set_identity(2)
+
+                            task.wait(1.5);
 
                             firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
@@ -1014,9 +1045,13 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
 
                 if CurrentWorld.Name ~= workspace._EGGS[Client.Locals["Egg"]].Name then
                     if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
-                        Utilities:TpMethod(GetPortal(WorldIndex).Range.Position);
+                        local Teleporter, Position = GetClosestTeleporter();
+
+                        Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
 
                         set_identity(2)
+
+                        task.wait(1.5);
 
                         firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
@@ -1029,6 +1064,8 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
                 end
 
                 if Distance <= 13 then
+                    set_identity(8)
+
                     Client.Server:FireServer({
                         "BuyHeroes",
                         Client.Locals["Egg"]
@@ -1288,6 +1325,44 @@ Toggles["Auto Buy Swords"]:OnChanged(function()
             end
 
             task.wait(1);
+        end
+    end)
+end)
+
+MiscTab:AddToggle("Auto Claim Daily Rewards", {
+    Text = "Auto Claim Daily Rewards",
+    Default = false,
+    Tooltip = "Auto claim daily rewards will claim the daily reward for you.",
+})
+
+local function GetUnclaimedRewards()
+    local Rewards = {};
+
+    for _, Reward in next, game:GetService("Players").LocalPlayer.PlayerGui.CenterUI.DailyRewards.Main.Scroll:GetChildren() do
+        if Reward:IsA("ImageLabel") and Reward:FindFirstChildOfClass("ImageButton").claimed.Visible == false then
+            table.insert(Rewards, Reward.Name);
+        end
+    end
+
+    return Rewards;
+end
+
+Toggles["Auto Claim Daily Rewards"]:OnChanged(function()
+    task.spawn(function()
+        while Toggles["Auto Claim Daily Rewards"].Value do
+            if Library.Unloaded then break; end
+            if not Entity.isAlive then return; end
+
+            local UnclaimedRewards = GetUnclaimedRewards();
+
+            if #UnclaimedRewards > 0 then
+                Client.Server:FireServer({
+                    "DailyRewards",
+                    UnclaimedRewards[1]
+                });
+            end
+
+            task.wait(0.1);
         end
     end)
 end)
