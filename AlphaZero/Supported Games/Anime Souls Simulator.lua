@@ -513,6 +513,8 @@ MainTab:AddToggle("Auto Hit", {
     Tooltip = "Auto Punch/Swing will punch for you.",
 })
 
+local TeleportToWorld = require(LocalPlayer.PlayerGui.Init.Client.Services.TeleportService);
+
 Toggles["Auto Hit"]:OnChanged(function()
     task.spawn(function()
         while Toggles["Auto Hit"].Value do
@@ -599,17 +601,19 @@ Toggles["Auto Quest"]:OnChanged(function()
                     --HitsUntilKill:SetText(string.format("Hits Until Kill: %s", GetHitsUntilKill(ClosestEnemy)));
 
                     if ClosestEnemy.Parent.Name ~= CurrentIsland then
-                        local Teleporter, Position = GetClosestTeleporter();
+                        -- local Teleporter, Position = GetClosestTeleporter();
 
-                        Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+                        -- Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
 
-                        set_identity(2)
+                        -- set_identity(2)
 
-                        task.wait(1.5);
+                        -- task.wait(1.5);
 
-                        firesignal(GetTeleportGui(GetIndex(ClosestEnemy.Parent)).tp.MouseButton1Click);
+                        -- firesignal(GetTeleportGui(GetIndex(ClosestEnemy.Parent)).tp.MouseButton1Click);
 
-                        task.wait(5);
+                        TeleportToWorld(tonumber(GetIndex(ClosestEnemy.Parent)));
+
+                        task.wait(3);
                     end
 
                     if Distance <= 5 then
@@ -698,17 +702,19 @@ Toggles["Teleport To Enemy"]:OnChanged(function()
 
                 if CurrentWorld.Name ~= Enemy.Parent.Name then
                     if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
-                        local Teleporter, Position = GetClosestTeleporter();
+                        -- local Teleporter, Position = GetClosestTeleporter();
 
-                        Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+                        -- Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
 
-                        set_identity(2)
+                        -- set_identity(2)
 
-                        task.wait(1.5);
+                        -- task.wait(1.5);
 
-                        firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+                        -- firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
-                        task.wait(5);
+                        TeleportToWorld(tonumber(WorldIndex));
+
+                        task.wait(3);
                     else
                         GameNotify("Error", "You cannot teleport to this island.");
                         Toggles["Teleport To Enemy"]:SetValue(false);
@@ -849,21 +855,23 @@ Toggles["Auto Attack Meteors"]:OnChanged(function()
                             PrimaryPart.Parent
                         });
                     else
-                        if World.Name ~= CurrentWorld.Name and WorldCheck(World) == false then
+                        if World and CurrentWorld and World.Name ~= CurrentWorld.Name and WorldCheck(World) == false then
                             if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
                                 Client.Locals["Attacking Meteor"] = true;
 
-                                local Teleporter, Position = GetClosestTeleporter();
+                                -- local Teleporter, Position = GetClosestTeleporter();
 
-                                Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+                                -- Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
 
-                                set_identity(2)
+                                -- set_identity(2)
 
-                                task.wait(1.5);
+                                -- task.wait(1.5);
 
-                                firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+                                -- firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
-                                task.wait(5);
+                                TeleportToWorld(tonumber(WorldIndex));
+
+                                task.wait(3);
                             end
                         end
 
@@ -910,7 +918,7 @@ MainTab:AddLabel("Boss");
 
 local function GetAliveBoss()
     for _, Boss in next, workspace["_RAID_BOSSES"]:GetChildren() do
-        if Boss:IsA("Model") and Boss:FindFirstChild("Humanoid") and Boss.Humanoid.Health > 0 then
+        if Boss:IsA("Model") and Boss:FindFirstChild("Humanoid") and Boss.Humanoid.Health > 0 and Boss:FindFirstChild("HumanoidRootPart") then
             return Boss;
         end
     end
@@ -964,17 +972,19 @@ Toggles["Auto Attack Boss"]:OnChanged(function()
                         if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
                             Client.Locals["Attacking Boss"] = true;
 
-                            local Teleporter, Position = GetClosestTeleporter();
+                            -- local Teleporter, Position = GetClosestTeleporter();
 
-                            Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+                            -- Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
                             
-                            set_identity(2)
+                            -- set_identity(2)
 
-                            task.wait(1.5);
+                            -- task.wait(1.5);
 
-                            firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+                            -- firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
-                            task.wait(5);
+                            TeleportToWorld(tonumber(WorldIndex));
+
+                            task.wait(3);
                         end
                     end
 
@@ -1045,17 +1055,19 @@ Toggles["Auto Buy Egg"]:OnChanged(function()
 
                 if CurrentWorld.Name ~= workspace._EGGS[Client.Locals["Egg"]].Name then
                     if LocalPlayer.PlayerGui.CenterUI.Teleport.Main.Scroll[WorldIndex].locked.Visible == false then
-                        local Teleporter, Position = GetClosestTeleporter();
+                        -- local Teleporter, Position = GetClosestTeleporter();
 
-                        Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
+                        -- Utilities:TpMethod(Client.Locals["Teleport Method"], Position);
 
-                        set_identity(2)
+                        -- set_identity(2)
 
-                        task.wait(1.5);
+                        -- task.wait(1.5);
 
-                        firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
+                        -- firesignal(GetTeleportGui(WorldIndex).tp.MouseButton1Click);
 
-                        task.wait(5);
+                        TeleportToWorld(tonumber(WorldIndex));
+
+                        task.wait(3);
                     else
                         GameNotify("Error", "You cannot teleport to this island.");
                         Toggles["Auto Buy Egg"]:SetValue(false);
