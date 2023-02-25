@@ -217,8 +217,6 @@ local esp_funcs = {}
 function esp_funcs:CreateTab(window)
     local EspTab = window:AddTab('Esp')
 
-    local EspTab = Window:AddTab('Esp')
-
     local MainEspTab = EspTab:AddLeftGroupbox('Enabled')
     local TextTab = EspTab:AddLeftGroupbox('Text Settings')
     local BoxTab = EspTab:AddRightGroupbox('Box Settings')
