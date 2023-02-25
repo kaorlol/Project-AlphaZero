@@ -8,7 +8,9 @@ getgenv().esp_config = {
     Box = {
         Color = Color3.new(1,1,1),
         Thickness = 2
-    }
+    },
+    TeamCheck = false,
+    TeamColor = false,
 }
 
 local espObjects = {}
@@ -148,6 +150,8 @@ end)
 
 game:GetService("RunService").Heartbeat:Connect(function()
     for i, object in pairs(espObjects) do
+        local showDrawings = true
+
         if isvalidplayer(object.Player) then
             if not(object.Player.Character.HumanoidRootPart:IsDescendantOf(game.Workspace)) or object.Player.Character.Humanoid.Health <= 0 then
                 object.Remove = true
@@ -167,19 +171,18 @@ game:GetService("RunService").Heartbeat:Connect(function()
 
             object.Update()
 
-            if onScreen == false then
+            if onScreen then
                 for _, drawing in pairs(object.Drawings) do
-                    drawing.Visible = false
+                    drawing.Visible = true
+                    drawing.Transparency = 1
                 end
             else
                 for _, drawing in pairs(object.Drawings) do
-                    print'setting to visible'
-                    drawing.Transparency = 1
+                    drawing.Transparency = 0
+                    
                 end
             end
-        end
-
-        if ESP_ENABLED == false then
+        else
             for _, drawing in pairs(object.Drawings) do
                 drawing.Transparency = 0
             end
@@ -195,6 +198,14 @@ game:GetService("RunService").Heartbeat:Connect(function()
             if object.Type == 'Box' then
                 drawing.Color = esp_config.Box.Color
                 drawing.Thickness = esp_config.Box.Thickness
+
+                if esp_config.TeamColor then
+                    drawing.Color = object.Player.TeamColor.Color
+                end
+            end
+
+            if esp_config.TeamCheck and game.Players.LocalPlayer.Team == object.Player.Team then
+                drawing.Transparency = 0
             end
         end
     end
@@ -206,17 +217,37 @@ local esp_funcs = {}
 function esp_funcs:CreateTab(window)
     local EspTab = window:AddTab('Esp')
 
-    local EspEnabledTab = EspTab:AddLeftGroupbox('Enabled')
+    local EspTab = Window:AddTab('Esp')
+
+    local MainEspTab = EspTab:AddLeftGroupbox('Enabled')
     local TextTab = EspTab:AddLeftGroupbox('Text Settings')
     local BoxTab = EspTab:AddRightGroupbox('Box Settings')
 
-    EspEnabledTab:AddToggle('Enabled', {
+    MainEspTab:AddToggle('EspEnabled', {
         Text = 'Esp Enabled',
-        Default = true,
+        Default = false,
         Tooltip = 'Toggles the esp'
     })
-    Toggles.Enabled:OnChanged(function()
-        ESP_ENABLED = Toggles.Enabled.Value
+    Toggles.EspEnabled:OnChanged(function()
+        ESP_ENABLED = Toggles.EspEnabled.Value
+    end)
+
+    MainEspTab:AddToggle('TeamCheck', {
+        Text = 'Team Check',
+        Default = false,
+        Tooltip = 'Dont show players on your team'
+    })
+    Toggles.TeamCheck:OnChanged(function()
+        esp_config.TeamCheck = Toggles.TeamCheck.Value
+    end)
+
+    MainEspTab:AddToggle('UseTeamColor', {
+        Text = 'Use Team Color',
+        Default = false,
+        Tooltip = 'Assigns color based on team'
+    })
+    Toggles.UseTeamColor:OnChanged(function()
+        esp_config.TeamColor = Toggles.UseTeamColor.Value
     end)
 
 
@@ -248,6 +279,7 @@ function esp_funcs:CreateTab(window)
     Options.TextSize:OnChanged(function()
         esp_config.Text.Size = Options.TextSize.Value
     end)
+
 
 
     BoxTab:AddLabel('Color'):AddColorPicker('BoxColor', {
