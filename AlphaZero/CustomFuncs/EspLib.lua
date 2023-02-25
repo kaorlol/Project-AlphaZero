@@ -289,7 +289,7 @@ function esp_funcs:CreateTab(window)
 
 
     BoxTab:AddSlider('BoxThickness', {
-        Text = 'Text Size',
+        Text = 'Box Thickness',
         Default = 2,
         Min = 0,
         Max = 5,
