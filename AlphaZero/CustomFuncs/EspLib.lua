@@ -319,15 +319,18 @@ function playerHasEsp(player)
     return false
 end
 
-while task.wait() do
-    if ESP_ENABLED then
-        for i,v in pairs(game:GetService("Players")) do
-            if playerHasEsp(v) == false then
-                initPlayer(v)
+task.spawn(function()
+    while task.wait() do
+        if ESP_ENABLED then
+            for i,v in pairs(game:GetService("Players")) do
+                if playerHasEsp(v) == false then
+                    initPlayer(v)
+                end
             end
         end
     end
-end
+end)
+
             
 
 game.Players.PlayerRemoving:Connect(function(player)
