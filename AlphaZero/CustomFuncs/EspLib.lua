@@ -399,12 +399,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 drawing.Transparency = 0
             end
             
-            -- if object.Remove then
-            --     for _, drawing in pairs(object.Drawings) do
-            --         drawing:Remove()
-            --     end
-            --     table.remove(espObjects, i)
-            -- end
+            if object.Remove then
+                for _, drawing in pairs(object.Drawings) do
+                    drawing:Remove()
+                end
+                table.remove(espObjects, i)
+            end
         end
     end
 end)
