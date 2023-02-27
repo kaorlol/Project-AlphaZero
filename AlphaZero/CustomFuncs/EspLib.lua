@@ -273,6 +273,8 @@ function isvalidplayer(player)
     return player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Head")
 end
 
+
+
 function initPlayer(player)
     task.spawn(function()
         repeat
@@ -287,26 +289,46 @@ function initPlayer(player)
         addTracer(player)
 
 
-        player.CharacterAdded:Connect(function()
-            repeat task.wait() until isvalidplayer(player)
+        -- player.CharacterAdded:Connect(function()
+        --     repeat task.wait() until isvalidplayer(player)
 
-            addFill(player)
-            addCorners(player)
-            addBox(player)
-            addNametag(player)
-            addHealthbar(player)
-            addTracer(player)
-        end)
+        --     addFill(player)
+        --     addCorners(player)
+        --     addBox(player)
+        --     addNametag(player)
+        --     addHealthbar(player)
+        --     addTracer(player)
+        -- end)
     end)
 end
 
-for i,v in pairs(game.Players:GetChildren()) do
-    initPlayer(v)
+-- for i,v in pairs(game.Players:GetChildren()) do
+--     initPlayer(v)
+-- end
+
+-- game.Players.PlayerAdded:Connect(function(player)
+--     initPlayer(player)
+-- end)
+
+function playerHasEsp(player)
+    for i,v in pairs(espObjects) do
+        if v.Player == player then
+            return true
+        end
+    end
+    return false
 end
 
-game.Players.PlayerAdded:Connect(function(player)
-    initPlayer(player)
-end)
+while task.wait() do
+    if ESP_ENABLED then
+        for i,v in pairs(game:GetService("Players")) do
+            if playerHasEsp(v) == false then
+                initPlayer(v)
+            end
+        end
+    end
+end
+            
 
 game.Players.PlayerRemoving:Connect(function(player)
     for i,v in pairs(espObjects) do
@@ -651,3 +673,4 @@ end
 end
 
 return initEsp
+
