@@ -322,7 +322,7 @@ end
 task.spawn(function()
     while task.wait() do
         if ESP_ENABLED then
-            for i,v in pairs(game:GetService("Players")) do
+            for i,v in pairs(game:GetService("Players"):GetChildren()) do
                 if playerHasEsp(v) == false then
                     initPlayer(v)
                 end
@@ -674,6 +674,8 @@ end)
 end
 
 end
+
+initEsp()
 
 return initEsp
 
