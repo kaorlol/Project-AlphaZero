@@ -274,24 +274,29 @@ function isvalidplayer(player)
 end
 
 function initPlayer(player)
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Head") and player.Character:FindFirstChild("Humanoid") then
+    task.spawn(function()
+        repeat
+            task.wait()
+        until player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Head") and player.Character:FindFirstChild("Humanoid")
+
         addBox(player)
         addNametag(player)
         addHealthbar(player)
         addCorners(player)
         addFill(player)
         addTracer(player)
-    end
 
-    player.CharacterAdded:Connect(function()
-        repeat task.wait() until isvalidplayer(player)
 
-        addFill(player)
-        addCorners(player)
-        addBox(player)
-        addNametag(player)
-        addHealthbar(player)
-        addTracer(player)
+        player.CharacterAdded:Connect(function()
+            repeat task.wait() until isvalidplayer(player)
+
+            addFill(player)
+            addCorners(player)
+            addBox(player)
+            addNametag(player)
+            addHealthbar(player)
+            addTracer(player)
+        end)
     end)
 end
 
@@ -319,7 +324,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 
         if isvalidplayer(object.Player) then
             if not(object.Player.Character.HumanoidRootPart:IsDescendantOf(game.Workspace)) or object.Player.Character.Humanoid.Health <= 0 then
-                showDrawings = false
+                object.Remove = true
             end
         end
 
