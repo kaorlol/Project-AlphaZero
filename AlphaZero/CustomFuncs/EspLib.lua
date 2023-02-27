@@ -675,7 +675,6 @@ end
 
 end
 
-initEsp()
 
 return initEsp
 
