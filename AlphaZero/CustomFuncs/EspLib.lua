@@ -60,6 +60,7 @@ function addBox(player)
         Update = update,
         Drawings = {box},
         Player = player,
+        Character = player.Character,
         Type = 'Box'
     })
 end
@@ -84,6 +85,7 @@ function addFill(player)
         Update = update,
         Drawings = {box},
         Player = player,
+        Character = player.Character,
         Type = 'Fill'
     })
 end
@@ -112,6 +114,7 @@ function addNametag(player)
         Update = update,
         Drawings = {text},
         Player = player,
+        Character = player.Character,
         Type = "Text"
     })
 
@@ -156,6 +159,7 @@ function addHealthbar(player)
         Update = update,
         Drawings = {bar, barBackground},
         Player = player,
+        Character = player.Character,
         Type = "Healthbar"
     })
 end
@@ -226,6 +230,7 @@ function addCorners(player)
         Update = update,
         Drawings = lines,
         Player = player,
+        Character = player.Character,
         Type = "Corners"
     })
 end
@@ -265,6 +270,7 @@ function addTracer(player) -- uncompleted
         Update = update,
         Drawings = {tracer},
         Player = player,
+        Character = player.Character,
         Type = "Tracer"
     })
 end
@@ -273,6 +279,9 @@ function isvalidplayer(player)
     return player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Head")
 end
 
+function isvalidcharacter(char)
+    return char and char:FindFirstChild("Humanoid") and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Head")
+end
 
 
 function initPlayer(player)
@@ -289,49 +298,57 @@ function initPlayer(player)
         addTracer(player)
 
 
-        -- player.CharacterAdded:Connect(function()
-        --     repeat task.wait() until isvalidplayer(player)
+        player.CharacterAdded:Connect(function()
+            repeat task.wait() until isvalidplayer(player)
 
-        --     addFill(player)
-        --     addCorners(player)
-        --     addBox(player)
-        --     addNametag(player)
-        --     addHealthbar(player)
-        --     addTracer(player)
-        -- end)
+            addFill(player)
+            addCorners(player)
+            addBox(player)
+            addNametag(player)
+            addHealthbar(player)
+            addTracer(player)
+        end)
+
+        player.CharacterRemoving:Connect(function(player)
+            for i,v in pairs(espObjects) do
+                if v.Player == player then
+                    v.Remove = true
+                end
+            end
+        end)
+
     end)
 end
 
--- for i,v in pairs(game.Players:GetChildren()) do
---     initPlayer(v)
--- end
-
--- game.Players.PlayerAdded:Connect(function(player)
---     initPlayer(player)
--- end)
-
-function playerHasEsp(player)
-    for i,v in pairs(espObjects) do
-        if v.Player == player then
-            return true
-        end
-    end
-    return false
+for i,v in pairs(game.Players:GetChildren()) do
+    initPlayer(v)
 end
 
-task.spawn(function()
-    while task.wait() do
-        if ESP_ENABLED then
-            for i,v in pairs(game:GetService("Players"):GetChildren()) do
-                if playerHasEsp(v) == false then
-                    initPlayer(v)
-                end
-            end
-        end
-    end
+game.Players.PlayerAdded:Connect(function(player)
+    initPlayer(player)
 end)
 
-            
+-- function playerHasEsp(player)
+--     for i,v in pairs(espObjects) do
+--         if v.Player == player then
+--             return true
+--         end
+--     end
+--     return false
+-- end
+
+-- task.spawn(function()
+--     while task.wait() do
+--         if ESP_ENABLED then
+--             for i,v in pairs(game:GetService("Players"):GetChildren()) do
+--                 if playerHasEsp(v) == false then
+--                     initPlayer(v)
+--                 end
+--             end
+--         end
+--     end
+-- end)
+
 
 game.Players.PlayerRemoving:Connect(function(player)
     for i,v in pairs(espObjects) do
@@ -347,20 +364,19 @@ game:GetService("RunService").RenderStepped:Connect(function()
     for i, object in pairs(espObjects) do
         local showDrawings = true
 
-        if isvalidplayer(object.Player) then
-            if not(object.Player.Character.HumanoidRootPart:IsDescendantOf(game.Workspace)) or object.Player.Character.Humanoid.Health <= 0 then
-                object.Remove = true
-            end
-        end
+        if ESP_ENABLED and object.Remove == nil and isvalidcharacter(object.Character) then
+            local hrp = object.Character:FindFirstChild("HumanoidRootPart") and object.Character.HumanoidRootPart
+            if hrp ~= false and hrp ~= nil then
 
-        if ESP_ENABLED and object.Remove == nil and isvalidplayer(object.Player) then
-            local hrp = object.Player.Character.HumanoidRootPart
-            local _, onScreen = camera:WorldToViewportPoint(hrp.Position)
+                local _, onScreen = camera:WorldToViewportPoint(hrp.Position)
 
-            object.Update()
+                object.Update()
 
-            if onScreen then
-                showDrawings = true
+                if onScreen then
+                    showDrawings = true
+                else
+                    showDrawings = false
+                end
             else
                 showDrawings = false
             end
@@ -368,7 +384,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
             showDrawings = false
         end
 
+        if showDrawings then
+            if object.Character.Humanoid.Health <= 0 then
+                object.Remove = true
+            end
+        end
+
         for _, drawing in pairs(object.Drawings) do
+            do
+
             if esp_config[object.Type].Enabled == false then
                 showDrawings = false
             end
@@ -422,6 +446,8 @@ game:GetService("RunService").RenderStepped:Connect(function()
 
             if esp_config.TeamCheck and game.Players.LocalPlayer.Team == object.Player.Team then
                 drawing.Transparency = 0
+            end
+
             end
             
             if object.Remove then
@@ -674,7 +700,6 @@ end)
 end
 
 end
-
 
 return initEsp
 
