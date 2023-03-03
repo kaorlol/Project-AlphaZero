@@ -309,9 +309,9 @@ function initPlayer(player)
             addTracer(player)
         end)
 
-        player.CharacterRemoving:Connect(function(player)
+        player.CharacterRemoving:Connect(function(char)
             for i,v in pairs(espObjects) do
-                if v.Player == player then
+                if v.Player == player or v.Character == char then
                     v.Remove = true
                 end
             end
@@ -384,11 +384,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
             showDrawings = false
         end
 
-        if showDrawings then
-            if object.Character.Humanoid.Health <= 0 then
-                object.Remove = true
-            end
-        end
+        -- if showDrawings then
+        --     if object.Character.Humanoid.Health <= 0 then
+        --         object.Remove = true
+        --     end
+        -- end
 
         for _, drawing in pairs(object.Drawings) do
             do
