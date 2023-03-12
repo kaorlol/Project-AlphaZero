@@ -11,4 +11,5 @@ return {
     ["10875701453"] = "ManEatingTrain";
     ["6284583030"] = "Pet%20Simulator%20X";
     ["11542692507"] = "Anime%20Souls%20Simulator";
+    ['3297964905'] = "Weaponry";
 }
