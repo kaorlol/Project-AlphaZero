@@ -12,4 +12,5 @@ return {
     ["6284583030"] = "Pet%20Simulator%20X";
     ["11542692507"] = "Anime%20Souls%20Simulator";
     ['3297964905'] = "Weaponry";
+    ["6722284015"] = 'Pistol%201v1';
 }
