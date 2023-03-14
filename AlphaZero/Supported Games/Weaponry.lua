@@ -203,9 +203,9 @@ MainTab:AddToggle("Always Sprint", {
 })
 
 MainTab:AddToggle("Funny Head", {
-    Text = "Makes your head go brrrr",
+    Text = "Funny Head",
     Default = false,
-    Tooltip = "Makes your head go brrrr on others screens",
+    Tooltip = "Makes your head spin around, only visible to others",
 })
 
 local HeadChance = 25;
@@ -227,11 +227,11 @@ MainTab:AddToggle("Big Head", {
     Tooltip = "Makes the enemies head bigger so you can hit people easier",
 })
 
-MainTab:AddToggle("Kill All", {
-    Text = "Kill All",
-    Default = false,
-    Tooltip = "Kills all players on the server",
-})
+-- MainTab:AddToggle("Kill All", {
+--     Text = "Kill All",
+--     Default = false,
+--     Tooltip = "Kills all players on the server",
+-- })
 
 rconsolelog("Info", "Successfully loaded functions");
 
